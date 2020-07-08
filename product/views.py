@@ -39,7 +39,7 @@ def owns(req, product_name):
         product = Product.objects.get(name=product_name)
         product_serial = ProductSerial.objects.get(name=product_name, owner=self.user)
     except:
-        return HttpResponseNotFound()
+            return HttpResponseRedirect(reverse('register_product',  kwargs={'product': product_name}))
     return HttpResponse("owns product")
 
 
@@ -76,6 +76,8 @@ def register(req, product_name):
             return render(req, 'product/register_serial.html', context)
     except:
         return HttpResponseNotFound()
+    #register is not needed
+    return HttpResponseRedirect(reverse('registration_done'))
 
 
 @require_GET
