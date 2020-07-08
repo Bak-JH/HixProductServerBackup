@@ -1,0 +1,17 @@
+{% load socialaccount %}
+<html>
+  <head>
+    <title>Product Login</title>
+  </head>
+  <body>
+  <h1>Product Login</h1>
+  {% if user.is_authenticated %}
+  <p>Already logged in {{ user.username }}, close browser</p>
+ 
+  {% else %}
+  <h1>Login to use product</h1>
+  <a href="{% provider_login_url 'google' next='/product/login_redirect/' %}">Login with Google</a>
+  {% endif %}
+
+  </body>
+</html>
