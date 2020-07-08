@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Register Serial</title>
+</head>
+<body>
+  <h1>Register serial: {{ product.name }}</h1>
+  <p>Owner: {{ user.username }}</p>
+  <form action="" method="post">
+    {% csrf_token %}
+    <table>
+    {{ form.as_table }}
+    </table>
+    <input type="submit" value="Submit">
+  </form>
+</body>

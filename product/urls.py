@@ -26,5 +26,7 @@ urlpatterns = [
     path('login/', views.product_login, name = 'product_login'),
     path('login_redirect/', views.product_login_redirect, name = 'product_login_redirect'),
     path('check_login/', views.check_login, name = 'check_login'),
-
+    path('owns/<str:product_name>', views.owns, name = 'owns_product'),
+    path('register/<str:product_name>', views.register, name = 'register_product'),
+    path('registration_done/', TemplateView.as_view(template_name="product/registration_done.html"), name = 'registration_done'),
 ]
