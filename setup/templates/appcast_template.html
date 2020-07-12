@@ -1,0 +1,12 @@
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+    <title>DentStudio</title>
+    <description>Most recent updates to DentStudio</description>
+    <item>
+        <title>Version {{ release.version }}</title>
+        <sparkle:releaseNotesLink> {{ release.patchNote }} </sparkle:releaseNotesLink>
+        <pubDate>{{ release.date }}</pubDate>
+        <enclosure url="{{ release.exe }}" sparkle:version="{{ release.version }}" length="0" type="application/octet-stream"/>
+    </item>
+    </channel>
+</rss>
