@@ -1,13 +1,11 @@
+{% extends 'product/base.html' %}
 {% load socialaccount %}
-<html>
-  <head>
-    <title>Product Login</title>
-  </head>
-  <body>
+{% block title %}
+<title>Product Login</title>
+{% endblock %}
+{% block content %}
   <h1>Product Login</h1>
   {% if user.is_authenticated %}
   <p>Product login success {{ user.username }}, close browser and continue.</p>
   {% endif %}
-
-  </body>
-</html>
+{% endblock %}
