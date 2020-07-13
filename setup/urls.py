@@ -18,7 +18,6 @@ from django.contrib import admin
 from setup.views import download_file, get_latest
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
     url(r'^download/', download_file, name='download'),
     url(r'^latest-appcast/', get_latest, name='getLatest')
 ]
