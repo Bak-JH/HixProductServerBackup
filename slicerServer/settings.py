@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'slicerServer',
     'product',
+    'setup',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -175,6 +176,10 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+global latest_info
 
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_AGE = 120960000
