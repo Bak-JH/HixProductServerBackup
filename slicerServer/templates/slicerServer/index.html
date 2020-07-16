@@ -1,19 +1,29 @@
 {% load socialaccount %}
+{% providers_media_js %}
+
 <html>
   <head>
     <title>Home</title>
   </head>
   <body>
   <h1>Home</h1>
-  {% if user.is_authenticated %}
+  {% comment %} {% if user.is_authenticated %}
   <p>Welcome, {{ user.username }} !</p>
  
-  {% else %}
-  <h1>My Google Login Project</h1>
+  {% else %} {% endcomment %}
+  {% comment %} <h1>My Google Login Project</h1> {% endcomment %}
   <!-- <a href="{% provider_login_url 'google'%}">Login with Google</a> -->
-  <a href="{% provider_login_url 'google' next='/product/login_redirect/' %}">Login with Google</a>
+  {% comment %} <a href="{% provider_login_url 'google' next='/product/login_redirect/' %}">Login with Google</a> {% endcomment %}
+{% comment %} 
+    <a href="{% provider_login_url "naver" next='/product/login_redirect/' %}" class="w-full border font-medium text-white mb-2 border-green-500 text-center rounded-sm py-5 bg-green-500">
+        <i class="xi-naver-square xi-x mr-1"></i> Continue with Naver
+    </a> 
+    <br>
+  	<!-- receiving from django-allauth -->    
+    <a href="{% provider_login_url "google" next='/product/login_redirect/' %}" class="w-full border font-medium text-white mb-2 border-red-500 text-center rounded-sm py-5 bg-red-500">
+        <i class="fab fa-google mr-2"></i> Continue with Google
+    </a> {% endcomment %}
 
-  {% endif %}
 
   </body>
 </html>

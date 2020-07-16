@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.naver',
+
     'channels',
     'crispy_forms',
 
@@ -163,8 +165,13 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {
             'access_type': 'online',
         }
-    }
+    },
+    # 'naver': {
+	# 	'AUTH_PARAMS': {'response_type': 'code'},
+	# }
 }
+
+
 
 ASGI_APPLICATION = "slicerServer.routing.application"
 
@@ -192,3 +199,5 @@ CSRF_COOKIE_SECURE = True
 LATEST_INFO = {
     
 }
+
+# ACCOUNT_EMAIL_REQUIRED = True
