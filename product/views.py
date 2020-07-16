@@ -15,20 +15,22 @@ from product.models import Product, ProductSerial
 from product.forms import RegisterSerialForm
 from django.db import models
 
+from allauth.account.signals import user_signed_up
+from allauth.socialaccount.models import SocialAccount
 
-@require_GET
-# @login_required
-def check_login(req):
-    """Checks logged in status"""
-    if not req.user.is_authenticated:
-        return HttpResponseForbidden()
+# @require_GET
+# # @login_required
+# def check_login(req):
+#     """Checks logged in status"""
+#     if not req.user.is_authenticated:
+#         return HttpResponseForbidden()
 
-    num_visits = req.session.get('num_visits', 0)
-    num_visits += 1
-    req.session['num_visits'] = num_visits
-    respStr = f"you are logged in, visited this page: {num_visits} in this session"
+#     num_visits = req.session.get('num_visits', 0)
+#     num_visits += 1
+#     req.session['num_visits'] = num_visits
+#     respStr = f"you are logged in, visited this page: {num_visits} in this session"
 
-    return HttpResponse(respStr)
+#     return HttpResponse(respStr)
 
 
 @require_GET
@@ -91,3 +93,15 @@ def product_login(req):
 @login_required
 def product_login_redirect(req):
     return render(req, 'product/login_redirect.html')
+
+
+
+def on_signup(request, user, **kwargs):
+    social_user = SocialAccount.objects.filter(user=user)
+    if social_user.exists():
+        if social_user.provider == 'naver':
+            user.last_name = social_user[0].extra_data['name']
+            user.email = social_user[0].extra_data['email']
+            user.save()
+
+user_signed_up.connect(on_signup)
