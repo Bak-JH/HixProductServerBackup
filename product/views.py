@@ -99,7 +99,7 @@ def product_login_redirect(req):
 def on_signup(request, user, **kwargs):
     social_user = SocialAccount.objects.filter(user=user)
     if social_user.exists():
-        if social_user.provider == 'naver':
+        if social_user.get_provider() == 'naver':
             user.last_name = social_user[0].extra_data['name']
             user.email = social_user[0].extra_data['email']
             user.save()
