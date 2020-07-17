@@ -1,3 +1,10 @@
+from __future__ import absolute_import, unicode_literals
+from django.conf import settings
+import os
+import json
+
+
+
 """
 Django settings for slicerServer project.
 
@@ -133,7 +140,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = '../static/'
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 
@@ -201,3 +208,15 @@ LATEST_INFO = {
 }
 
 # ACCOUNT_EMAIL_REQUIRED = True
+
+
+#이 구문은 shared_task를 위해 장고가 시작될 때 app이 항상 임포트 되도록 하는 역할을 합니다.
+from setup.tasks import app as celery_app
+from django.conf import settings
+import os
+import json
+__all__ = ('celery_app', )
+filename = os.path.join(BASE_DIR, "setup/update_info.json")
+with open(filename, "r") as json_file:
+    settings.LATEST_INFO = json.load(json_file)
+    settings.LATEST_INFO['exe'] = os.path.join(BASE_DIR, "setup/templates/DentSlicerSetup.exe")
