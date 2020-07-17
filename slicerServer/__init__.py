@@ -7,8 +7,3 @@ import json
 from setup.tasks import app as celery_app
 
 __all__ = ('celery_app', )
-
-filename = os.path.join(settings.BASE_DIR, "setup/update_info.json")
-with open(filename, "r") as json_file:
-    settings.LATEST_INFO = json.load(json_file)
-    settings.LATEST_INFO['exe'] = os.path.join(settings.BASE_DIR, "setup/templates/DentSlicerSetup.exe")
