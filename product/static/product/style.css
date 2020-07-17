@@ -1,0 +1,25 @@
+
+
+.btn-naver {
+  color: #fff;
+  background-color: #1EC800;
+  border-color: #1EC800;
+}
+
+.btn-naver:hover {
+  color: #fff;
+  background-color: #127401;
+  border-color: #127401;
+}
+
+.btn-google {
+  color: #fff;
+  background-color: #4285F4;
+  border-color: #4285F4;
+}
+
+.btn-google:hover {
+  color: #fff;
+  background-color: #2a569e;
+  border-color: #2a569e;
+}

@@ -24,4 +24,6 @@ class ProductSerial(models.Model):
     owner = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=False, blank=False)
     expire_date = models.DateField(null=True, blank=True, help_text='Expiry date, if blank means does not expire.')
+    created_date = models.DateTimeField(auto_now_add=True)
+
     #TODO: constraint to make sure {owner, product} is unique when owner is NOT NULL
