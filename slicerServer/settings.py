@@ -141,7 +141,7 @@ STATIC_ROOT = '../static/'
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 
-SITE_ID = 0
+SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
 #mine, for testing
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
