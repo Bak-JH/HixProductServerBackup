@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from setup.views import download_file, get_latest
+from setup.views import download_slicer, get_latest, download_firmware
 
 urlpatterns = [
-    url(r'^download/', download_file, name='download'),
-    url(r'^latest-appcast/', get_latest, name='getLatest')
+    url(r'^download/dentslicer', download_slicer, name='download-slicer'),
+    url(r'^download/firmware', download_firmware, name='download-firmware'),
+    url(r'^update-info/', get_latest, name='get-latest')
 ]
 
