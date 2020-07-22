@@ -9,6 +9,9 @@
  
   {% else %}
   <h1>Login to use product</h1>
-  <a href="{% provider_login_url 'google' next='/product/login_redirect/' %}">Login with Google</a>
+    <a class="btn btn-google w-100 m-1" href="{% provider_login_url 'google' next='/product/login_redirect/' %}" role="button"><i class="xi-google xi-x"></i> Login with Google</a>
+    <br>
+    <a class="btn btn-naver w-100 m-1" href="{% provider_login_url 'naver' next='/product/login_redirect/' %}" role="button"><i class="xi-naver xi-x"></i> Login with Naver</a>
+
   {% endif %}
 {% endblock %}

@@ -1,3 +1,7 @@
+from __future__ import absolute_import, unicode_literals
+
+
+
 """
 Django settings for slicerServer project.
 
@@ -45,6 +49,8 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.naver',
+
     'channels',
     'crispy_forms',
 
@@ -131,11 +137,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = '../static/'
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 
-SITE_ID = 0
+SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
 #mine, for testing
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -163,8 +169,13 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {
             'access_type': 'online',
         }
-    }
+    },
+    # 'naver': {
+	# 	'AUTH_PARAMS': {'response_type': 'code'},
+	# }
 }
+
+
 
 ASGI_APPLICATION = "slicerServer.routing.application"
 
@@ -183,12 +194,22 @@ CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_AGE = 120960000
 ACCOUNT_SESSION_REMEMBER = True
-
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
 
 LATEST_INFO = {
     
 }
+setupFile = ""
+# ACCOUNT_EMAIL_REQUIRED = True
+
+
+#이 구문은 shared_task를 위해 장고가 시작될 때 app이 항상 임포트 되도록 하는 역할을 합니다.
+from setup.tasks import app as celery_app
+
+__all__ = ('celery_app', )
+
+
