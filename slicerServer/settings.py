@@ -53,7 +53,8 @@ INSTALLED_APPS = [
 
     'channels',
     'crispy_forms',
-
+    'management',
+    'resin'
 ]
 
 MIDDLEWARE = [
