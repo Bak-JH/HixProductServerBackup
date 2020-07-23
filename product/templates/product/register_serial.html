@@ -6,7 +6,7 @@
 
 {% block content %}
   <h1>Register serial: {{ product.name }}</h1>
-  <p>Owner: {{ user.username }}</p>
+  <p>Owner: {{ user.username }}, Email: {{user.email}}</p>
   <form action=""  method="post">
     {% csrf_token %}
     {{ form|crispy }}
