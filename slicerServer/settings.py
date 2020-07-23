@@ -28,7 +28,7 @@ UPDATE_FILE_DIR = os.path.join(BASE_DIR, 'SetupFiles')
 SECRET_KEY = 'lpuy*em0gp)2pr5mvxaptp@(7x1iuq0_+gwa+_l^8#q!o&-kq+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
