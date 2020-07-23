@@ -38,7 +38,7 @@ class ProductConsumer(AsyncWebsocketConsumer):
 
 
     async def disconnect(self, close_code):
-        pass
+        await self.close()
 
     async def receive(self, text_data):
         pass
