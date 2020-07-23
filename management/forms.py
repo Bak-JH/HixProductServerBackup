@@ -2,11 +2,8 @@ import datetime
 
 
 from django import forms
-from django.core.exceptions import ValidationError
-from django.utils.translation import ugettext_lazy as _
-from resin.models import Material
 
-
+# resin manager
 class AddResinForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.product = kwargs.pop('resin')

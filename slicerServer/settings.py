@@ -19,6 +19,7 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__name__)))
+UPDATE_FILE_DIR = os.path.join(BASE_DIR, 'SetupFiles')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -189,9 +190,6 @@ CHANNEL_LAYERS = {
     },
 }
 
-BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_AGE = 120960000
 ACCOUNT_SESSION_REMEMBER = True
@@ -200,17 +198,6 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-
-LATEST_INFO = {
-    
-}
-setupFile = ""
 # ACCOUNT_EMAIL_REQUIRED = True
-
-
-#이 구문은 shared_task를 위해 장고가 시작될 때 app이 항상 임포트 되도록 하는 역할을 합니다.
-from setup.tasks import app as celery_app
-
-__all__ = ('celery_app', )
 
 

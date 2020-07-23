@@ -13,13 +13,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.conf.urls import url
-from django.contrib import admin
-from setup.views import download_slicer, get_latest, download_firmware
+from django.urls import path
+from . import views
 
 urlpatterns = [
-    url(r'^download/dentslicer', download_slicer, name='download-slicer'),
-    url(r'^download/firmware', download_firmware, name='download-firmware'),
-    url(r'^update-info/', get_latest, name='get-latest')
+    path('get_update_manifest/<str:product_name>', views.get_update_manifest, name='get-manifest'),
+    path('get_file/<str:product_name>/<str:file_name>', views.get_file, name='get-file'),
 ]
 
