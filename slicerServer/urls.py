@@ -23,12 +23,15 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('manage/', include('management.urls')),
     path('accounts/', include('allauth.urls')), 
     path('', TemplateView.as_view(template_name="slicerServer/index.html")),
-    path('product/', include('product.urls')),
-    path('setup/', include('setup.urls')),
     path('privacy', TemplateView.as_view(template_name="slicerServer/privacypolicy.html")),
     path('terms', TemplateView.as_view(template_name="slicerServer/termsofservice.html")),
+    path('product/', include('product.urls')),
+    path('resin/', include('resin.urls')),
+    path('setup/', include('setup.urls')),
+
 ]
 
 

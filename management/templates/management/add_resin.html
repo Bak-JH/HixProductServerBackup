@@ -1,0 +1,75 @@
+{% extends 'management/base.html' %}
+
+<title>Register Resin</title>
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <h1>Add Resin Info</h1>
+  <hr />
+
+  <form action=""  method="post">
+    {% csrf_token %}
+    <div class="form-row">
+      <div class="form-group col-md-3 mb-0">
+        {{ form.M_id|as_crispy_field }}
+      </div>
+      <div class="form-group col-md-3 mb-0">
+        {{ form.bed_curing_layer|as_crispy_field }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-3 mb-0">
+        {{ form.bed_curing_time|as_crispy_field }}
+      </div>
+      <div class="form-group col-md-3 mb-0">
+        {{ form.curing_time|as_crispy_field }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-3 mb-0">
+        {{ form.layer_delay|as_crispy_field }}
+      </div>
+      <div class="form-group col-md-3 mb-0">
+        {{ form.z_hop_height|as_crispy_field }}
+      </div>
+    </div>
+    <hr />
+
+    <div class="form-row">
+      <div class="form-group col-md-3 mb-0">
+        {{ form.max_speed|as_crispy_field }}
+      </div>
+      <div class="form-group col-md-3 mb-0">
+        {{ form.init_speed|as_crispy_field }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-3 mb-0">
+        {{ form.up_accel_speed|as_crispy_field }}
+      </div>
+      <div class="form-group col-md-3 mb-0">
+        {{ form.up_decel_speed|as_crispy_field }}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group col-md-3 mb-0">
+        {{ form.down_accel_speed|as_crispy_field }}
+      </div>
+      <div class="form-group col-md-3 mb-0">
+        {{ form.down_decel_speed|as_crispy_field }}
+      </div>
+    </div>
+    <hr />
+
+    <div class="form-row">
+      <div class="form-group col-md-3 mb-0">
+        {{ form.contraction_ratio|as_crispy_field }}
+      </div>
+      <div class="form-group col-md-3 mb-0">
+        {{ form.led_offset|as_crispy_field }}
+      </div>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-success">Submit</button>
+  </form>
+{% endblock %}
