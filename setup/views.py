@@ -18,10 +18,10 @@ def get_file(request, product_name, file_name):
     response = HttpResponse(content_type='application/force-download')
 
     try:
-        with open(os.path.join(target_path + "\\" + file_name)) as file:
+        with open(os.path.join(target_path + "/" + file_name)) as file:
             data = file.read()
     except:
-        with open(os.path.join(target_path + "\\" + file_name), 'r+b') as bin_file:
+        with open(os.path.join(target_path + "/" + file_name), 'r+b') as bin_file:
             data = bin_file.read()
 
     response.write(data)
