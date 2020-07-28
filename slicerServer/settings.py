@@ -28,7 +28,7 @@ UPDATE_FILE_DIR = os.path.join(BASE_DIR, 'SetupFiles')
 SECRET_KEY = 'lpuy*em0gp)2pr5mvxaptp@(7x1iuq0_+gwa+_l^8#q!o&-kq+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -189,6 +189,14 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_AGE = 120960000
+ACCOUNT_SESSION_REMEMBER = True
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # ACCOUNT_EMAIL_REQUIRED = True
 

@@ -13,7 +13,6 @@ class RegisterSerialForm(forms.Form):
     serial_number = forms.UUIDField(help_text="Enter product key")
 
     def __init__(self,*args,**kwargs):
-        self.product = kwargs.pop('product')
         super(RegisterSerialForm,self).__init__(*args,**kwargs)
 
     def clean_serial_number(self):
@@ -24,8 +23,6 @@ class RegisterSerialForm(forms.Form):
             raise ValidationError(_('Invalid serial number - serial key does not exist'))
         if(product_serial.owner is not None):
             raise ValidationError(_('Invalid serial number - serial already registered'))
-        if(product_serial.product != self.product):
-            raise ValidationError(_('Invalid serial number - serial for different product'))
         return data
 
 class LoginForm(forms.Form):
