@@ -12,7 +12,7 @@ from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpRespons
 from django.core.exceptions import MultipleObjectsReturned 
 from django.urls import reverse
 from product.models import Product, ProductSerial
-from product.forms import RegisterSerialForm
+from product.forms import RegisterSerialForm, LoginForm
 from django.db import models
 
 from allauth.account.signals import user_signed_up
@@ -87,7 +87,8 @@ def product_login(req):
     """Checks logged in status"""
     if req.user.is_authenticated:
         return HttpResponseRedirect('/product/login_redirect/')
-    return render(req, 'product/login.html')
+    form = LoginForm()
+    return render(req, 'product/login.html', {'form': form})
 
 
 @login_required
