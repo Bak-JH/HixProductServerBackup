@@ -5,7 +5,7 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-  <h1>Register serial: {{ product.name }}</h1>
+  <h1>Register serial</h1>
   <p>Owner: {{ user.username }}, Email: {{user.email}}</p>
   <form action=""  method="post">
     {% csrf_token %}

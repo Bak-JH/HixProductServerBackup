@@ -39,24 +39,25 @@ def owns(req, product_name):
     """Checks is user owns product"""
     try:        
         product = Product.objects.get(name=product_name)
-        product_serial = ProductSerial.objects.get(name=product_name, owner=self.user)
+        print(product.name)
+        product_serial = ProductSerial.objects.get(product=product, owner=req.user)
+        print(req.user)
     except:
-            return HttpResponseRedirect(reverse('register_product',  kwargs={'product': product_name}))
+        return HttpResponseRedirect(reverse('register_product'))
     return HttpResponse("owns product")
 
 
 @login_required
-def register(req, product_name):
+def register(req):
     """Register product if product exists and user doesn't own product"""
-    product = get_object_or_404(Product, name=product_name)
     try:
         #check user doens't already own the product
-        product_serial = ProductSerial.objects.get(product=product, owner=req.user)
+        product_serial = ProductSerial.objects.get(owner=req.user)
     except ProductSerial.DoesNotExist:
         # If this is a POST request then process the Form data
         if req.method == 'POST':
             # Create a form instance and populate it with data from the request (binding):
-            form = RegisterSerialForm(req.POST, product=product)
+            form = RegisterSerialForm(req.POST)
             # Check if the form is valid:/
             if form.is_valid():
                 #register serial
@@ -69,11 +70,10 @@ def register(req, product_name):
 
         # If this is a GET (or any other method) create the default form.
         else:
-            form = RegisterSerialForm(product=product)
+            form = RegisterSerialForm()
             context = {
                 'form': form,
-                'product': product,
-                'user' : req.user,
+                'user': req.user,
             }
             return render(req, 'product/register_serial.html', context)
     except:
