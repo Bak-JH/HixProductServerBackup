@@ -37,20 +37,23 @@ from allauth.socialaccount.models import SocialAccount
 @login_required
 def owns(req, product_name):
     """Checks is user owns product"""
-    try:        
+    global input_product_name
+    input_product_name = product_name
+    try:
         product = Product.objects.get(name=product_name)
         product_serial = ProductSerial.objects.get(product=product, owner=req.user)
     except:
-        return HttpResponseRedirect(reverse('register_product',  kwargs={'product_name': product_name}))
+        return HttpResponseRedirect(reverse('register_product'))
     return HttpResponse("owns product")
 
 
 @login_required
 def register(req):
     """Register product if product exists and user doesn't own product"""
+    product_name = ""
     try:
         #check user doens't already own the product
-        product_serial = ProductSerial.objects.get(owner=req.user)
+        product_serial = ProductSerial.objects.get(product=input_product_name,owner=req.user)
     except ProductSerial.DoesNotExist:
         # If this is a POST request then process the Form data
         if req.method == 'POST':
@@ -63,8 +66,9 @@ def register(req):
                 register_product_serial = ProductSerial.objects.get(serial_number=serial)
                 register_product_serial.owner = req.user
                 register_product_serial.save()
+                product_name = register_product_serial.product.name
                 # redirect to a new URL:
-                return HttpResponseRedirect(reverse('registration_done'))
+                return HttpResponseRedirect(reverse('owns_product', kwargs={'product_name': product_name}))
 
         # If this is a GET (or any other method) create the default form.
         else:
@@ -77,7 +81,7 @@ def register(req):
     except:
         return HttpResponseNotFound()
     #register is not needed
-    return HttpResponseRedirect(reverse('registration_done'))
+    return HttpResponseRedirect(reverse('owns_product', kwargs={'product_name': input_product_name}))
 
 
 @require_GET
