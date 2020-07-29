@@ -1,6 +1,5 @@
 import datetime
 
-
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
@@ -8,22 +7,28 @@ from product.models import Product, ProductSerial
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column
 
-class RegisterSerialForm(forms.Form):
 
+class RegisterSerialForm(forms.Form):
     serial_number = forms.UUIDField(help_text="Enter product key")
 
-    def __init__(self,*args,**kwargs):
-        super(RegisterSerialForm,self).__init__(*args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user')
+        super(RegisterSerialForm, self).__init__(*args, **kwargs)
 
     def clean_serial_number(self):
         data = self.cleaned_data['serial_number']
         try:
             product_serial = ProductSerial.objects.get(serial_number=data)
         except:
-            raise ValidationError(_('Invalid serial number - serial key does not exist'))
-        if(product_serial.owner is not None):
-            raise ValidationError(_('Invalid serial number - serial already registered'))
+            raise ValidationError(_('Invalid serial number - serial key does not exist'), code='invalid')
+
+        if product_serial.owner == self.user:
+            raise ValidationError(_('user already registered'), code='invalid')
+        elif product_serial.owner is not None:
+            raise ValidationError('Invalid serial number - serial already registered')
+
         return data
+
 
 class LoginForm(forms.Form):
     id = forms.CharField(label="ID")

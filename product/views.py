@@ -37,8 +37,6 @@ from allauth.socialaccount.models import SocialAccount
 @login_required
 def owns(req, product_name):
     """Checks is user owns product"""
-    global input_product_name
-    input_product_name = product_name
     try:
         product = Product.objects.get(name=product_name)
         product_serial = ProductSerial.objects.get(product=product, owner=req.user)
@@ -50,39 +48,32 @@ def owns(req, product_name):
 @login_required
 def register(req):
     """Register product if product exists and user doesn't own product"""
-    product_name = ""
-    try:
-        #check user doens't already own the product
-        product_serial = ProductSerial.objects.get(product=input_product_name,owner=req.user)
-    except ProductSerial.DoesNotExist:
-        # If this is a POST request then process the Form data
-        if req.method == 'POST':
-            # Create a form instance and populate it with data from the request (binding):
-            form = RegisterSerialForm(req.POST)
-            # Check if the form is valid:/
-            if form.is_valid():
-                #register serial
-                serial = form.cleaned_data['serial_number']
-                register_product_serial = ProductSerial.objects.get(serial_number=serial)
-                register_product_serial.owner = req.user
-                register_product_serial.save()
-                product_name = register_product_serial.product.name
-                # redirect to a new URL:
-                return HttpResponseRedirect(reverse('owns_product', kwargs={'product_name': product_name}))
-
-        # If this is a GET (or any other method) create the default form.
+    if req.method == 'POST':
+        # Create a form instance and populate it with data from the request (binding):
+        form = RegisterSerialForm(req.POST, user=req.user)
+        # Check if the form is valid:/
+        if form.is_valid():
+            #register serial
+            serial = form.cleaned_data['serial_number']
+            register_product_serial = ProductSerial.objects.get(serial_number=serial)
+            register_product_serial.owner = req.user
+            register_product_serial.save()
+            product_name = register_product_serial.product.name
+            # redirect to a new URL:
+            return HttpResponseRedirect(reverse('owns_product', kwargs={'product_name': product_name}))
         else:
-            form = RegisterSerialForm()
-            context = {
-                'form': form,
-                'user': req.user,
-            }
-            return render(req, 'product/register_serial.html', context)
-    except:
-        return HttpResponseNotFound()
-    #register is not needed
-    return HttpResponseRedirect(reverse('owns_product', kwargs={'product_name': input_product_name}))
+            return render(req, "product/registration_done.html", {"form":form})
 
+    # If this is a GET (or any other method) create the default form.
+    else:
+        form = RegisterSerialForm(user=req.user)
+        context = {
+            'form': form,
+            'user': req.user,
+        }
+        return render(req, 'product/register_serial.html', context)
+    
+    return render(req, 'product/registration_done.html')
 
 @require_GET
 def product_login(req):

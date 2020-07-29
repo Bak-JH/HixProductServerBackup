@@ -7,20 +7,19 @@
 {% endblock %}
 {% block content %}
   {% if user.is_authenticated %}
-  <p>Already logged in {{ user.username }}, close browser</p>
- 
+  <p>Already logged in {{ user.username }}, close browser</p> 
   {% else %}
+  
   <h1>Login to use product</h1>
   <br>
-
   <a class="btn btn-google w-100 m-1" href="{% provider_login_url 'google' next='/product/login_redirect/' %}" role="button"><i class="xi-google xi-x"></i> Login with Google</a>
   <br>
-
   <a class="btn btn-naver w-100 m-1" href="{% provider_login_url 'naver' next='/product/login_redirect/' %}" role="button"><i class="xi-naver xi-x"></i> Login with Naver</a>
   <br>
-
   <hr class="mt-4 mb-4">
 
-  <a class="btn btn-naver w-100 m-1" href="https://services.hix.co.kr/accounts/login">hello?</a>
-  {% endif %}
+  <form class="login" method="POST" action="{% url 'product_login_redirect' %}">
+    {% csrf_token %}
+    <button class="btn btn-default" type="submit">Login</button>
+  </form>  {% endif %}
 {% endblock %}
