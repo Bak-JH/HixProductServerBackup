@@ -21,23 +21,6 @@
 
   <hr class="mt-4 mb-4">
 
-  <form class="login" method="POST" action="{% url 'product_login_redirect' %}">
-    {% csrf_token %}
-    <div class="form-row">
-      <div class="form-group col-md-6 mb-0">
-        {{ form.id|as_crispy_field }}
-      </div>
-      <br>
-      <div class="form-group col-md-6 mb-0">
-        {{ form.password|as_crispy_field }}
-      </div>
-    </div>
-    <br>
-    {% if redirect_field_value %}
-    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
-    {% endif %}
-    <button class="primaryAction" type="submit">Sign In</button>
-    <button class="btn btn-default" type="submit">Login</button>
-  </form>
+  <a class="btn btn-naver w-100 m-1" href="https://services.hix.co.kr/accounts/login">hello?</a>
   {% endif %}
 {% endblock %}

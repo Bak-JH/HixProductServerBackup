@@ -39,11 +39,9 @@ def owns(req, product_name):
     """Checks is user owns product"""
     try:        
         product = Product.objects.get(name=product_name)
-        print(product.name)
         product_serial = ProductSerial.objects.get(product=product, owner=req.user)
-        print(req.user)
     except:
-        return HttpResponseRedirect(reverse('register_product'))
+        return HttpResponseRedirect(reverse('register_product',  kwargs={'product_name': product_name}))
     return HttpResponse("owns product")
 
 
