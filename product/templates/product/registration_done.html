@@ -8,12 +8,6 @@
 <title>Registration Finished</title>
 {% endblock %}
 {% block content %}
-  {% if form.errors %}
-    {% for message in form.errors.values %}
-      <h3> {{ message }} </h3>
-    {% endfor %}
-  {% else %}
     <h1>Registration Finished</h1>
-  {% endif %}
 {% endblock %}
 
