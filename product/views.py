@@ -62,7 +62,11 @@ def register(req):
             # redirect to a new URL:
             return HttpResponseRedirect(reverse('owns_product', kwargs={'product_name': product_name}))
         else:
-            return render(req, "product/registration_done.html", {"form":form})
+            context = {
+                'form': form,
+                'user': req.user
+            }
+            return render(req, 'product/register_serial.html', context)
 
     # If this is a GET (or any other method) create the default form.
     else:
