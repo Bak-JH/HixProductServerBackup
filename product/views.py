@@ -73,7 +73,7 @@ def register(req):
         }
         return render(req, 'product/register_serial.html', context)
     
-    return render(req, 'product/registration_done.html')
+    return HttpResponseRedirect(reverse('registration_done'))
 
 @require_GET
 def product_login(req):
@@ -88,6 +88,9 @@ def product_login(req):
 def product_login_redirect(req):
     return render(req, 'product/login_redirect.html')
 
+@login_required
+def registration_done(req):
+    return render(req, 'product/registration_done.html')
 
 
 def on_signup(request, user, **kwargs):
