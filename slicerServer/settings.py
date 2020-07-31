@@ -178,7 +178,6 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 
-
 ASGI_APPLICATION = "slicerServer.routing.application"
 
 CHANNEL_LAYERS = {

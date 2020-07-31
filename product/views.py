@@ -12,7 +12,7 @@ from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpRespons
 from django.core.exceptions import MultipleObjectsReturned 
 from django.urls import reverse
 from product.models import Product, ProductSerial
-from product.forms import RegisterSerialForm
+from product.forms import RegisterSerialForm, LoginForm
 from django.db import models
 
 from allauth.account.signals import user_signed_up
@@ -37,63 +37,64 @@ from allauth.socialaccount.models import SocialAccount
 @login_required
 def owns(req, product_name):
     """Checks is user owns product"""
-    try:        
+    try:
         product = Product.objects.get(name=product_name)
-        product_serial = ProductSerial.objects.get(name=product_name, owner=self.user)
+        product_serial = ProductSerial.objects.get(product=product, owner=req.user)
     except:
-            return HttpResponseRedirect(reverse('register_product',  kwargs={'product': product_name}))
+        return HttpResponseRedirect(reverse('register_product'))
     return HttpResponse("owns product")
 
 
 @login_required
-def register(req, product_name):
+def register(req):
     """Register product if product exists and user doesn't own product"""
-    product = get_object_or_404(Product, name=product_name)
-    try:
-        #check user doens't already own the product
-        product_serial = ProductSerial.objects.get(product=product, owner=req.user)
-    except ProductSerial.DoesNotExist:
-        # If this is a POST request then process the Form data
-        if req.method == 'POST':
-            # Create a form instance and populate it with data from the request (binding):
-            form = RegisterSerialForm(req.POST, product=product)
-            # Check if the form is valid:/
-            if form.is_valid():
-                #register serial
-                serial = form.cleaned_data['serial_number']
-                register_product_serial = ProductSerial.objects.get(serial_number=serial)
-                register_product_serial.owner = req.user
-                register_product_serial.save()
-                # redirect to a new URL:
-                return HttpResponseRedirect(reverse('registration_done'))
-
-        # If this is a GET (or any other method) create the default form.
+    if req.method == 'POST':
+        # Create a form instance and populate it with data from the request (binding):
+        form = RegisterSerialForm(req.POST, user=req.user)
+        # Check if the form is valid:/
+        if form.is_valid():
+            #register serial
+            serial = form.cleaned_data['serial_number']
+            register_product_serial = ProductSerial.objects.get(serial_number=serial)
+            register_product_serial.owner = req.user
+            register_product_serial.save()
+            product_name = register_product_serial.product.name
+            # redirect to a new URL:
+            return HttpResponseRedirect(reverse('owns_product', kwargs={'product_name': product_name}))
         else:
-            form = RegisterSerialForm(product=product)
             context = {
                 'form': form,
-                'product': product,
-                'user' : req.user,
+                'user': req.user
             }
             return render(req, 'product/register_serial.html', context)
-    except:
-        return HttpResponseNotFound()
-    #register is not needed
-    return HttpResponseRedirect(reverse('registration_done'))
 
+    # If this is a GET (or any other method) create the default form.
+    else:
+        form = RegisterSerialForm(user=req.user)
+        context = {
+            'form': form,
+            'user': req.user,
+        }
+        return render(req, 'product/register_serial.html', context)
+    
+    return HttpResponseRedirect(reverse('registration_done'))
 
 @require_GET
 def product_login(req):
     """Checks logged in status"""
     if req.user.is_authenticated:
         return HttpResponseRedirect('/product/login_redirect/')
-    return render(req, 'product/login.html')
+    form = LoginForm()
+    return render(req, 'product/login.html', {'form': form})
 
 
 @login_required
 def product_login_redirect(req):
     return render(req, 'product/login_redirect.html')
 
+@login_required
+def registration_done(req):
+    return render(req, 'product/registration_done.html')
 
 
 def on_signup(request, user, **kwargs):

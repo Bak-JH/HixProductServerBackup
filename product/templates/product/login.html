@@ -1,17 +1,25 @@
 {% extends 'product/base.html' %}
 {% load socialaccount %}
+{% load crispy_forms_tags %}
+
 {% block title %}
 <title>HiX Local Library</title>
 {% endblock %}
 {% block content %}
   {% if user.is_authenticated %}
-  <p>Already logged in {{ user.username }}, close browser</p>
- 
+  <p>Already logged in {{ user.username }}, close browser</p> 
   {% else %}
+  
   <h1>Login to use product</h1>
-    <a class="btn btn-google w-100 m-1" href="{% provider_login_url 'google' next='/product/login_redirect/' %}" role="button"><i class="xi-google xi-x"></i> Login with Google</a>
-    <br>
-    <a class="btn btn-naver w-100 m-1" href="{% provider_login_url 'naver' next='/product/login_redirect/' %}" role="button"><i class="xi-naver xi-x"></i> Login with Naver</a>
+  <br>
+  <a class="btn btn-google w-100 m-1" href="{% provider_login_url 'google' next='/product/login_redirect/' %}" role="button"><i class="xi-google xi-x"></i> Login with Google</a>
+  <br>
+  <a class="btn btn-naver w-100 m-1" href="{% provider_login_url 'naver' next='/product/login_redirect/' %}" role="button"><i class="xi-naver xi-x"></i> Login with Naver</a>
+  <br>
+  <hr class="mt-4 mb-4">
 
-  {% endif %}
+  <form class="login" method="POST" action="{% url 'product_login_redirect' %}">
+    {% csrf_token %}
+    <button class="btn btn-default" type="submit">Login</button>
+  </form>  {% endif %}
 {% endblock %}
