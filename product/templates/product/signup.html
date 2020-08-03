@@ -1,0 +1,17 @@
+{% extends 'product/base.html' %}
+{% load socialaccount %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+<title>HiX Local Library</title>
+{% endblock %}
+{% block content %}
+  {% if user.is_authenticated %}
+    <p>Already logged in {{ user.username }}, close browser</p> 
+  {% else %}
+    <form class="signup" method="POST">
+      {% csrf_token %}
+      {% crispy form %}
+    </form>
+  {% endif %}
+{% endblock %}
