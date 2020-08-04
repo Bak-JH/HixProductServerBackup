@@ -36,7 +36,7 @@ from allauth.socialaccount.models import SocialAccount
 
 
 @require_GET
-@login_required
+@login_required(login_url="/product/login")
 def owns(req, product_name):
     """Checks is user owns product"""
     try:
@@ -47,7 +47,7 @@ def owns(req, product_name):
     return HttpResponse("owns product")
 
 
-@login_required
+@login_required(login_url="/product/login")
 def register(req):
     """Register product if product exists and user doesn't own product"""
     if req.method == 'POST':
@@ -131,11 +131,11 @@ def product_login(request):
         return render(request, 'product/login.html', {'form': form})
 
 
-@login_required
+@login_required(login_url="/product/login")
 def product_login_redirect(req):
     return render(req, 'product/login_redirect.html')
 
-@login_required
+@login_required(login_url="/product/login")
 def registration_done(req):
     return render(req, 'product/registration_done.html')
 

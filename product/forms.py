@@ -31,7 +31,7 @@ class RegisterSerialForm(forms.Form):
         return data
 
 
-class LoginForm(forms.ModelForm):
+class LoginForm(forms.Form):
     username = forms.CharField(label='ID')
     password = forms.CharField(label='Password', widget=forms.PasswordInput)
 
@@ -55,10 +55,6 @@ class LoginForm(forms.ModelForm):
                 css_class='form-row'
             )
         )
-    class Meta:
-        model = User
-        widgets = {'password':forms.PasswordInput}
-        fields = ['username','password']
 
 class SignupForm(forms.ModelForm):
     username = forms.CharField(label='ID')
