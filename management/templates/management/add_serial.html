@@ -1,0 +1,50 @@
+{% extends 'management/base.html' %}
+
+<title>Register Resin</title>
+{% load crispy_forms_tags %}
+{% load bootstrap3 %}
+
+{% block extra_css %}
+{{ form.media.css }}
+{% endblock %}
+
+{% block extra_js %}
+{{ form.media.js }}
+{% endblock %}
+  
+{% block content %}
+<h1>Add Product Serial</h1>
+<hr />
+
+<form action=""  method="post">
+  {% csrf_token %}
+  <div class="form-row">
+    <div class="form-group col-md-3 mb-3">
+      {{ form.product|as_crispy_field }}
+    </div>
+    <div class="form-group col-md-2 mr-5">
+      {{ form.expire_date|as_crispy_field }}
+    </div>
+    <div class="form-group col-md-3 mb-3">
+      {{ form.number|as_crispy_field }}
+    </div>
+    <div class="form-group col-md-3 mt-4">
+      <button type="submit" class="btn btn-success">Generate</button>
+    </div>
+  </div>
+</form>
+
+{% if serials %}
+  {% for serial in serials %}
+    <h5> {{ serial }} </h5>
+  {% endfor %}
+{% endif %}
+
+<script>
+  $(function () {
+    $("#id_expire_date").datepicker({
+      format: 'yyyy-mm-dd'
+    });
+  });
+</script>
+{% endblock %}
