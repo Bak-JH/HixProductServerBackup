@@ -15,9 +15,12 @@ def update_check(request, printer_name):
     # materials = Material.objects.values("M_id","last_update")
     printer = get_object_or_404(Product, name=printer_name)
 
-    data = serializers.serialize("json",Material.objects.filter(printer=printer), fields=('name','last_update'))
-    print(data)
-    return HttpResponse(data, content_type="application/json")
+    main_dict = []
+    for mat in Material.objects.filter(printer=printer):
+        mat_dict[mat.name] = mat.last_update.strftime("%m/%d/%Y, %H:%M:%S")
+        main_dict.append(mat_dict);
+    jsonObj = json.dumps(main_dict)
+    return HttpResponse(jsonObj, content_type="application/json")
 
 def download_all(request, printer_name):
     printer = get_object_or_404(Product, name=printer_name)
