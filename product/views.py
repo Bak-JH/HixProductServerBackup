@@ -110,7 +110,12 @@ def product_login(request):
             user = authenticate(username=id, password=pw)
             if user is not None:
                 login(request, user=user)
-                return HttpResponseRedirect(reverse('product_login_redirect'))
+                
+                next_url = request.GET.get('next')
+                if next_url:
+                    return HttpResponseRedirect(next_url)
+                else:
+                    return HttpResponseRedirect(reverse('product_login_redirect'))
             else:
                 try: 
                     user = User.objects.get(username=request.POST['username'])

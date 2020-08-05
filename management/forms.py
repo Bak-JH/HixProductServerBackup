@@ -2,6 +2,8 @@ import datetime
 
 
 from django import forms
+from product.models import Product
+from datetime import date
 
 # resin manager
 class AddResinForm(forms.Form):
@@ -25,4 +27,12 @@ class AddResinForm(forms.Form):
 
     contraction_ratio = forms.FloatField(initial=0)
     led_offset = forms.FloatField(initial=0)
+
+class AddProductSerialForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(AddProductSerialForm, self).__init__(*args, **kwargs)
+
+    product = forms.ModelChoiceField(label="Product ", queryset=Product.objects.all())
+    expire_date = forms.DateField(label="Expire Date ", input_formats=['%Y-%m-%d'], widget=forms.DateInput(attrs={'readonly':'readonly'}))
+    number = forms.IntegerField(label="Number to Create ", initial=0)
 
