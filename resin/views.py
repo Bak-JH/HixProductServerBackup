@@ -2,6 +2,7 @@ import json
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from django.core import serializers
+from datetime import datetime
 
 from django.forms.models import model_to_dict
 
@@ -23,6 +24,7 @@ def download_all(request, printer_name):
     main_dict = {}
     for mat in Material.objects.filter(printer=printer):
         mat_dict = {}
+        mat_dict['last_update'] = mat.last_update.strftime("%m/%d/%Y, %H:%M:%S")
         for sett in PrintSetting.objects.filter(material=mat):
             data = serializers.serialize("json",[ sett, ])
             json_decoded = json.loads(data)

@@ -6,7 +6,8 @@ class Material(models.Model):
     name = models.CharField(max_length=50)
     printer = models.ForeignKey(Product, on_delete=models.CASCADE, null=False, blank=False)
     last_update = models.DateTimeField(auto_now=True)
-
+    def __str__(self):
+        return u'%s' % (self.name)
 # # Create your models here.
 # class LayerHeight(models.Model):
 #     layer_height = models.FloatField(blank=True, default=0)
@@ -28,6 +29,9 @@ class PrintSetting(models.Model):
     down_decel_speed = models.IntegerField(blank=True, default=0)
     contraction_ratio = models.FloatField(blank=True, default=0)
     led_offset = models.FloatField(blank=True, default=100)
+    def __str__(self):
+        return u'%s %s' % (self.material.name, self.layer_height)
+
     class Meta:
         unique_together = (('layer_height', 'material'),)
 

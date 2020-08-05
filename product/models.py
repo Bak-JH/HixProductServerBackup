@@ -17,7 +17,8 @@ import uuid
 
 class Product(models.Model):
     name = models.CharField(max_length=200, unique=True, primary_key=True, help_text="Name of the product")
-
+    def __str__(self):
+        return u'%s' % (self.name)
 class ProductSerial(models.Model):
     #Don't want to expose primary key to this table as serial number
     serial_number = models.UUIDField(default=uuid.uuid4, help_text='serial number generated with UUID4')
