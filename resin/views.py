@@ -17,8 +17,9 @@ def update_check(request, printer_name):
 
     main_dict = []
     for mat in Material.objects.filter(printer=printer):
+        mat_dict = {}
         mat_dict[mat.name] = mat.last_update.strftime("%m/%d/%Y, %H:%M:%S")
-        main_dict.append(mat_dict);
+        main_dict.append(mat_dict)
     jsonObj = json.dumps(main_dict)
     return HttpResponse(jsonObj, content_type="application/json")
 
