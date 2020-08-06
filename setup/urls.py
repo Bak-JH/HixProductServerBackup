@@ -19,5 +19,6 @@ from . import views
 urlpatterns = [
     path('get_update_manifest/<str:product_name>', views.get_update_manifest, name='get-manifest'),
     path('get_file/<str:product_name>/<str:file_name>', views.get_file, name='get-file'),
+    path('view_file/<str:product_name>/<str:file_name>', views.view_file, name='view-file')
 ]
 

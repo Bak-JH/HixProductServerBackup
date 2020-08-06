@@ -27,5 +27,16 @@ def get_file(request, product_name, file_name):
     response.write(data)
     return response
 
+def view_file(request, product_name, file_name):
+    target_path = os.path.join(settings.UPDATE_FILE_DIR, product_name)
 
+    if 'xml' in file_name:
+        response = HttpResponse(content_type='application/xml')
+    else:
+        response = HttpResponse(content_type='text/html')
 
+    with open(os.path.join(target_path + "\\" + file_name)) as file:
+        data = file.read()
+
+    response.write(data)
+    return response
