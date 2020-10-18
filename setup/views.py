@@ -25,7 +25,7 @@ def view_file(request, product_name, file_name):
     else:
         response = HttpResponse(content_type='text/html')
 
-    with open(os.path.join(target_path + "\\" + file_name)) as file:
+    with open(os.path.join(target_path + "/" + file_name)) as file:
         data = file.read()
 
     response.write(data)
