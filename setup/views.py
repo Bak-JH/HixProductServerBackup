@@ -6,6 +6,7 @@ import mimetypes
 # Create your views here.
 from django.conf import settings
 from django.http import HttpResponse
+from django.views.static import serve
 
 def get_update_manifest(request, product_name):
     target_path = os.path.join(settings.UPDATE_FILE_DIR, product_name)
@@ -14,18 +15,18 @@ def get_update_manifest(request, product_name):
 
 def get_file(request, product_name, file_name):
     target_path = os.path.join(settings.UPDATE_FILE_DIR, product_name)
+    return serve(request, os.path.basename(os.path.join(target_path, file_name)), os.path.dirname(os.path.join(target_path, file_name)))
 
-    response = HttpResponse(content_type='application/force-download')
+def view_file(request, product_name, file_name):
+    target_path = os.path.join(settings.UPDATE_FILE_DIR, product_name)
 
-    try:
-        with open(os.path.join(target_path + "/" + file_name)) as file:
-            data = file.read()
-    except:
-        with open(os.path.join(target_path + "/" + file_name), 'r+b') as bin_file:
-            data = bin_file.read()
+    if 'xml' in file_name:
+        response = HttpResponse(content_type='application/xml')
+    else:
+        response = HttpResponse(content_type='text/html')
+
+    with open(os.path.join(target_path + "/" + file_name)) as file:
+        data = file.read()
 
     response.write(data)
     return response
-
-
-
