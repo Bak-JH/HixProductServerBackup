@@ -20,6 +20,11 @@ from django.db import models
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.models import SocialAccount
 
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
+from management.views import current_user, UserList
+
 # @require_GET
 # # @login_required
 # def check_login(req):
@@ -97,10 +102,12 @@ def product_signup(request):
             form = SignupForm()
     return render(request, 'product/signup.html', {'form': form})
 
+@api_view(['GET', 'POST'])
 def product_login(request):
     """Checks logged in status"""
     if request.user.is_authenticated:
-        return HttpResponseRedirect('/product/login_redirect/')
+        return current_user(request._request)
+        # return HttpResponseRedirect('/product/login_redirect/')
     else:
         if request.method == 'POST':
             print(request.POST)

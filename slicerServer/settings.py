@@ -28,7 +28,7 @@ UPDATE_FILE_DIR = os.path.join(BASE_DIR, 'SetupFiles')
 SECRET_KEY = 'lpuy*em0gp)2pr5mvxaptp@(7x1iuq0_+gwa+_l^8#q!o&-kq+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -43,19 +43,23 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles', # default sample code ends here
     'django.contrib.sites',
-    'slicerServer',
-    'product',
-    'setup',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.naver',
-
+    'corsheaders',
     'channels',
     'crispy_forms',
+    'rest_framework',
+
+    'slicerServer',
+    'product',
+    'setup',
     'management',
-    'resin'
+    'resin',
+    'posts'
 ]
 
 MIDDLEWARE = [
@@ -66,6 +70,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'slicerServer.urls'
@@ -188,6 +193,27 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
+    ),
+}
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+JWT_AUTH = {
+    'JWT_RESPONSE_PAYLOAD_HANDLER': 'management.utils.my_jwt_response_handler'
+}
+
+# CORS_ORIGIN_WHITELIST = (
+#     'https://hix.co.kr',
+# )
 
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_AGE = 120960000

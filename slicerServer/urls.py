@@ -20,6 +20,7 @@ from django.views.generic import RedirectView
 from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework_jwt.views import obtain_jwt_token
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,7 +32,8 @@ urlpatterns = [
     path('product/', include('product.urls')),
     path('resin/', include('resin.urls')),
     path('setup/', include('setup.urls')),
-
+    path('post/', include('posts.urls')),
+    path('token-auth/', obtain_jwt_token),
 ]
 
 
