@@ -23,6 +23,9 @@ from allauth.socialaccount.models import SocialAccount
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
+import pprint
+
+
 from management.views import current_user, UserList
 
 # @require_GET
@@ -102,15 +105,20 @@ def product_signup(request):
             form = SignupForm()
     return render(request, 'product/signup.html', {'form': form})
 
-@api_view(['GET', 'POST'])
 def product_login(request):
     """Checks logged in status"""
-    if request.user.is_authenticated:
-        return current_user(request._request)
-        # return HttpResponseRedirect('/product/login_redirect/')
+    if request.user.is_authenticated: 
+        next_url = request.GET.get('next')
+        if next_url:
+                response = HttpResponseRedirect(next_url)
+                response.set_cookie('test', 'test?')
+                return response   
+        # return JsonResponse({'token': token})
+        response = HttpResponseRedirect('/product/login_redirect/')
+        response.set_cookie('test', 'test?')   
+        return response
     else:
         if request.method == 'POST':
-            print(request.POST)
             form = LoginForm(request.POST)
             id = request.POST['username']
             pw = request.POST['password']
@@ -120,7 +128,9 @@ def product_login(request):
                 
                 next_url = request.GET.get('next')
                 if next_url:
-                    return HttpResponseRedirect(next_url)
+                    response = HttpResponseRedirect(next_url)
+                    response.set_cookie('test', 'test?')
+                    return response
                 else:
                     return HttpResponseRedirect(reverse('product_login_redirect'))
             else:
@@ -145,6 +155,8 @@ def product_login(request):
 
 @login_required(login_url="/product/login")
 def product_login_redirect(req):
+    test = req.COOKIES.get('test')
+    print(test)
     return render(req, 'product/login_redirect.html')
 
 @login_required(login_url="/product/login")
