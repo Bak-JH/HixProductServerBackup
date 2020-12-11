@@ -33,7 +33,6 @@ urlpatterns = [
     path('resin/', include('resin.urls')),
     path('setup/', include('setup.urls')),
     path('post/', include('posts.urls')),
-    path('token-auth/', obtain_jwt_token),
 ]
 
 

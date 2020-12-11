@@ -4,26 +4,25 @@ from rest_framework.response import Response
 from django.http import HttpResponse
 from django.contrib.auth.decorators import permission_required
 from rest_framework.decorators import api_view
-from django.views.decorators.csrf import ensure_csrf_cookie
+from rest_framework import status
+from django.views.decorators.csrf import csrf_exempt
 
-
+@csrf_exempt
 @api_view(['GET'])
-@ensure_csrf_cookie
 def view_post(request, post_id):
     post_info = Post.objects.get(id=post_id)
     serializer = ViewPostSerializer(post_info)
     return Response(serializer.data)
 
+@csrf_exempt
 @api_view(['GET'])
-@ensure_csrf_cookie
 def post_list(request):
     posts = Post.objects.all()[0:10]
     serializer = ViewPostSerializer(posts, many=True)
     return Response(serializer.data)
 
 @api_view(['POST'])
-@ensure_csrf_cookie
-@permission_required('management.post')
+@permission_required('posts.add_post', raise_exception=True)
 def create_post(request):
     post_info = request.data
     serializer = CreatePostSerializer(post_info)
@@ -31,4 +30,4 @@ def create_post(request):
                     category=serializer.data['category'], 
                     content=serializer.data['content'])
     post_data.save()
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)

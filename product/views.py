@@ -22,9 +22,9 @@ from allauth.socialaccount.models import SocialAccount
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from django.views.decorators.csrf import ensure_csrf_cookie
 
-import pprint
-
+from django.views.decorators.csrf import csrf_exempt
 
 from management.views import current_user, UserList
 
@@ -104,18 +104,17 @@ def product_signup(request):
         else:
             form = SignupForm()
     return render(request, 'product/signup.html', {'form': form})
-
+    
 def product_login(request):
     """Checks logged in status"""
     if request.user.is_authenticated: 
         next_url = request.GET.get('next')
         if next_url:
-                response = HttpResponseRedirect(next_url)
-                response.set_cookie('test', 'test?')
-                return response   
+            response = HttpResponseRedirect(next_url)
+            return response   
         # return JsonResponse({'token': token})
-        response = HttpResponseRedirect('/product/login_redirect/')
-        response.set_cookie('test', 'test?')   
+        else:
+            response = HttpResponseRedirect('/product/login_redirect/')
         return response
     else:
         if request.method == 'POST':
@@ -129,10 +128,10 @@ def product_login(request):
                 next_url = request.GET.get('next')
                 if next_url:
                     response = HttpResponseRedirect(next_url)
-                    response.set_cookie('test', 'test?')
                     return response
                 else:
-                    return HttpResponseRedirect(reverse('product_login_redirect'))
+                    response = HttpResponseRedirect(reverse('product_login_redirect'))
+                    return response
             else:
                 try: 
                     user = User.objects.get(username=request.POST['username'])
@@ -155,8 +154,6 @@ def product_login(request):
 
 @login_required(login_url="/product/login")
 def product_login_redirect(req):
-    test = req.COOKIES.get('test')
-    print(test)
     return render(req, 'product/login_redirect.html')
 
 @login_required(login_url="/product/login")
