@@ -112,7 +112,6 @@ def product_login(request):
         if next_url:
             response = HttpResponseRedirect(next_url)
             return response   
-        # return JsonResponse({'token': token})
         else:
             response = HttpResponseRedirect('/product/login_redirect/')
         return response
