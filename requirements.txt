@@ -10,7 +10,6 @@ django-allauth==0.42.0
 django-allauth-templates-bootstrap4==0.34.11
 django-crispy-forms==1.9.1
 hiredis==1.0.1
-mysqlclient==1.4.6
 sqlparse==0.3.1
 Twisted==20.3.0
 django-cors-headers==3.5.0
