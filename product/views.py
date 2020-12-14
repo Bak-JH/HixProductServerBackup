@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
@@ -111,10 +111,12 @@ def product_login(request):
         next_url = request.GET.get('next')
         if next_url:
             response = HttpResponseRedirect(next_url)
+            response.set_cookie('username', request.user.username)
             return response   
         else:
             response = HttpResponseRedirect('/product/login_redirect/')
-        return response
+            response.set_cookie('username', request.user.username)
+            return response
     else:
         if request.method == 'POST':
             form = LoginForm(request.POST)
@@ -127,9 +129,11 @@ def product_login(request):
                 next_url = request.GET.get('next')
                 if next_url:
                     response = HttpResponseRedirect(next_url)
+                    response.set_cookie('username', user.username)
                     return response
                 else:
                     response = HttpResponseRedirect(reverse('product_login_redirect'))
+                    response.set_cookie('username', user.username)
                     return response
             else:
                 try: 
@@ -149,6 +153,23 @@ def product_login(request):
             form = LoginForm()
         
         return render(request, 'product/login.html', {'form': form})
+
+@login_required(login_url="/product/login")
+def product_logout(request):
+    if request.GET.get('clicked'):
+        logout(request)
+        next_url = request.GET.get('next')
+        if next_url:
+            response = HttpResponseRedirect(next_url)
+            response.delete_cookie('username')
+            return response   
+        else:
+            response = HttpResponseRedirect('/product/login/')
+            response.delete_cookie('username')
+            return response
+    else:
+        return render(request, 'product/logout.html')
+
 
 
 @login_required(login_url="/product/login")

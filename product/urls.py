@@ -24,6 +24,7 @@ from . import views
 
 urlpatterns = [
     path('login/', views.product_login, name = 'product_login'),
+    path('logout/', views.product_logout, name = 'product_logout'),
     path('signup/', views.product_signup, name = 'product_signup'),
     path('login_redirect/', views.product_login_redirect, name = 'product_login_redirect'),
     # path('check_login/', views.check_login, name = 'check_login'),
