@@ -1,8 +1,11 @@
 import datetime
+import urllib
+import json
 
 from django.shortcuts import render
 from django.views import generic
 from django.views.decorators.http import require_GET
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.decorators import permission_required
@@ -16,6 +19,7 @@ from django.urls import reverse
 from product.models import Product, ProductSerial
 from product.forms import RegisterSerialForm, LoginForm, SignupForm
 from django.db import models
+from django.conf import settings
 
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.models import SocialAccount
@@ -25,8 +29,7 @@ from rest_framework.decorators import api_view
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 from django.views.decorators.csrf import csrf_exempt
-
-from management.views import current_user, UserList
+from .utils import verify_recaptcha
 
 # @require_GET
 # # @login_required
@@ -97,13 +100,21 @@ def product_signup(request):
         if request.method == "POST":
             form = SignupForm(request.POST)
             if form.is_valid():
-                new_user = User.objects.create_user(**form.cleaned_data)
-                return HttpResponseRedirect(reverse('product_login'))
-
+                if verify_recaptcha(request.POST.get('g-recaptcha-response')):
+                    new_user = User.objects.create_user(**form.cleaned_data)
+                    return HttpResponseRedirect(reverse('product_login'))
+                else:
+                    messages.error(request, 'Invalid reCAPTCHA. Please try again.')
+                    return HttpResponse('Invalid reCAPTCHA. Please try again')
+            return render(request, 'product/signup.html', {'form': form})                        
         #get
         else:
             form = SignupForm()
-    return render(request, 'product/signup.html', {'form': form})
+            context = {
+                'form': form, 
+                'key': settings.RECAPTCHA_SITE_KEY
+            }
+            return render(request, 'product/signup.html', context)
     
 def product_login(request):
     """Checks logged in status"""

@@ -6,8 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User
 from product.models import Product, ProductSerial
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Row, Column, Submit, Field
-
+from crispy_forms.layout import Layout, Row, Column, Submit, Field, HTML
 
 class RegisterSerialForm(forms.Form):
     serial_number = forms.UUIDField(help_text="Enter product key")
@@ -84,6 +83,7 @@ class SignupForm(forms.ModelForm):
                 ),
                 css_class='form-row'
             ),
+            HTML('<input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">'),
             Row(
                 Submit('submit', 'Sign up', css_class='btn btn-primary w-100 m-1'),
                 css_class='form-row'

@@ -6,10 +6,22 @@
 <title>HiX Local Library</title>
 {% endblock %}
 {% block content %}
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+          crossorigin="anonymous"></script>
+  <script src="https://www.google.com/recaptcha/api.js?render={{ key }}"></script>
+  <script>
+    grecaptcha.ready(function() {
+        grecaptcha.execute("{{ key }}", {action: 'signup'})
+        .then(function(token) {
+            document.getElementById('g-recaptcha-response').value = token;
+        });
+    });
+  </script>
+
   {% if user.is_authenticated %}
     <p>Already logged in {{ user.username }}, close browser</p> 
   {% else %}
-    <form class="signup" method="POST">
+    <form id="signupform" class="signup" method="POST">
       {% csrf_token %}
       {% crispy form %}
     </form>
