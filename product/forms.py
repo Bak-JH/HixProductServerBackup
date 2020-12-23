@@ -57,7 +57,7 @@ class LoginForm(forms.Form):
 
 class SignupForm(forms.ModelForm):
     username = forms.CharField(label='ID')
-    email = forms.EmailField(label='Email', required=False)
+    email = forms.EmailField(label='Email')
     password = forms.CharField(label='Password', widget=forms.PasswordInput)
 
     def __init__(self, *args, **kwargs):

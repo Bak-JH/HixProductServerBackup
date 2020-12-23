@@ -136,7 +136,6 @@ def product_login(request):
             user = authenticate(username=id, password=pw)
             if user is not None:
                 login(request, user=user)
-                
                 next_url = request.GET.get('next')
                 if next_url:
                     response = HttpResponseRedirect(next_url)
@@ -148,9 +147,11 @@ def product_login(request):
                     return response
             else:
                 try: 
-                    print(User.objects.get(username=request.POST['username'], password=request.POST['password']))
                     user = User.objects.get(username=request.POST['username'])
-                    error = 'Password is incorrect'
+                    if not user.is_active:
+                        error = 'Email is not verified. Please check your email'
+                    else: 
+                        error = 'Password is incorrect'
                 except:
                     error = 'We cannot find an account with that ID'
 
