@@ -26,9 +26,8 @@ from allauth.socialaccount.models import SocialAccount
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from django.views.decorators.csrf import ensure_csrf_cookie
 
-from django.views.decorators.csrf import csrf_exempt
+from django_email_verification import sendConfirm
 from .utils import verify_recaptcha
 
 # @require_GET
@@ -102,6 +101,7 @@ def product_signup(request):
             if form.is_valid():
                 if verify_recaptcha(request.POST.get('g-recaptcha-response')):
                     new_user = User.objects.create_user(**form.cleaned_data)
+                    sendConfirm(new_user)
                     return HttpResponseRedirect(reverse('product_login'))
                 else:
                     messages.error(request, 'Invalid reCAPTCHA. Please try again.')
@@ -148,6 +148,7 @@ def product_login(request):
                     return response
             else:
                 try: 
+                    print(User.objects.get(username=request.POST['username'], password=request.POST['password']))
                     user = User.objects.get(username=request.POST['username'])
                     error = 'Password is incorrect'
                 except:

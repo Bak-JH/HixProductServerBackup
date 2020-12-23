@@ -20,6 +20,7 @@ from django.views.generic import RedirectView
 from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
+from django_email_verification import urls as mail_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,6 +33,7 @@ urlpatterns = [
     path('resin/', include('resin.urls')),
     path('setup/', include('setup.urls')),
     path('post/', include('posts.urls')),
+    path('email/', include(mail_urls)),
 ]
 
 

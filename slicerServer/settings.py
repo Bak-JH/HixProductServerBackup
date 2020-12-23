@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'channels',
     'crispy_forms',
     'rest_framework',
+    'django_email_verification',
 
     'slicerServer',
     'product',
@@ -210,6 +211,17 @@ CORS_ORIGIN_WHITELIST = (
     'https://hix.co.kr',
     'https://services.hix.co.kr',
 )
+
+EMAIL_ACTIVE_FIELD = 'is_active'
+EMAIL_SERVER = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_ADDRESS = 'bakjh.6280@gmail.com'
+EMAIL_PASSWORD = 'sda1628sda'
+EMAIL_FROM_ADDRESS = 'test@test.com'
+EMAIL_MAIL_SUBJECT = 'Confirm your email'
+EMAIL_MAIL_HTML = 'auth_mail.html'
+EMAIL_PAGE_TEMPLATE = 'confirm_mail.html'
+EMAIL_PAGE_DOMAIN = 'http://services.hix.co.kr/'
 
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_AGE = 120960000
