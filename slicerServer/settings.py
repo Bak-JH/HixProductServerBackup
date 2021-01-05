@@ -28,7 +28,7 @@ UPDATE_FILE_DIR = os.path.join(BASE_DIR, 'SetupFiles')
 SECRET_KEY = 'lpuy*em0gp)2pr5mvxaptp@(7x1iuq0_+gwa+_l^8#q!o&-kq+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"]
 
@@ -64,6 +64,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -71,7 +72,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'slicerServer.urls'
@@ -205,12 +205,16 @@ CHANNEL_LAYERS = {
 #     ),
 # }
 
-CORS_ORIGIN_ALLOW_ALL = False
-
-CORS_ORIGIN_WHITELIST = (
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
     'https://hix.co.kr',
     'https://services.hix.co.kr',
-)
+]
+
+CSRF_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS  = ['hix.co.kr', 'services.hix.co.kr']
+CSRF_COOKIE_DOMAIN = '.hix.co.kr'
 
 EMAIL_ACTIVE_FIELD = 'is_active'
 EMAIL_SERVER = 'smtp.gmail.com'
@@ -230,8 +234,6 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_DOMAIN_NAME = 'hix.co.kr'
 SESSION_COOKIE_SECURE = True
 
-CORS_ALLOW_CREDENTIALS = True
-
 ACCOUNT_SESSION_REMEMBER = True
 SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -240,9 +242,7 @@ USE_X_FORWARDED_HOST = True
 RECAPTCHA_SITE_KEY = "6LcBdgcaAAAAACT2L3b6-5uugc0W2Xlr3i62Hpq3"
 RECAPTCHA_SECRET_KEY = "6LcBdgcaAAAAAAjMT3qeFySEmu1e4yyqJCmE6Lxo"
 
-CSRF_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS  = ['hix.co.kr', 'services.hix.co.kr']
-CSRF_COOKIE_DOMAIN = '.hix.co.kr'
+
 # ACCOUNT_EMAIL_REQUIRED = True
 
 

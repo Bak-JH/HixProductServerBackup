@@ -122,11 +122,11 @@ def product_login(request):
         next_url = request.GET.get('next')
         if next_url:
             response = HttpResponseRedirect(next_url)
-            response.set_cookie('username', request.user.username)
+            response.set_cookie('username', request.user.username, domain=".hix.co.kr")
             return response   
         else:
             response = HttpResponseRedirect('/product/login_redirect/')
-            response.set_cookie('username', request.user.username)
+            response.set_cookie('username', request.user.username, domain=".hix.co.kr")
             return response
     else:
         if request.method == 'POST':
@@ -139,11 +139,11 @@ def product_login(request):
                 next_url = request.GET.get('next')
                 if next_url:
                     response = HttpResponseRedirect(next_url)
-                    response.set_cookie('username', user.username)
+                    response.set_cookie('username', user.username, domain=".hix.co.kr")
                     return response
                 else:
                     response = HttpResponseRedirect(reverse('product_login_redirect'))
-                    response.set_cookie('username', user.username)
+                    response.set_cookie('username', user.username, domain=".hix.co.kr")
                     return response
             else:
                 try: 
