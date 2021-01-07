@@ -17,7 +17,11 @@ def view_post(request, post_id):
 @csrf_exempt
 @api_view(['GET'])
 def post_list(request):
-    posts = Post.objects.all()[0:10]
+    post_category = request.GET.get('category')
+    if post_category is not None:
+        posts = Post.objects.filter(category=post_category)[0:10]
+    else:
+        posts = Post.objects.all()[0:10]
     serializer = ViewPostSerializer(posts, many=True)
     return Response(serializer.data)
 
