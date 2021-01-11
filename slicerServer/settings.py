@@ -43,22 +43,28 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles', # default sample code ends here
     'django.contrib.sites',
-    'slicerServer',
-    'product',
-    'setup',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.naver',
-
+    'corsheaders',
     'channels',
     'crispy_forms',
+    'rest_framework',
+    'django_email_verification',
+
+    'slicerServer',
+    'product',
+    'setup',
     'management',
-    'resin'
+    'resin',
+    'posts'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -189,13 +195,53 @@ CHANNEL_LAYERS = {
     },
 }
 
+# REST_FRAMEWORK = {
+#     'DEFAULT_PERMISSION_CLASSES': (
+#         'rest_framework.permissions.IsAuthenticated',
+#     ),
+#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#         'rest_framework.authentication.SessionAuthentication',
+#         'rest_framework.authentication.BasicAuthentication',
+#     ),
+# }
+
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    'https://hix.co.kr',
+    'https://services.hix.co.kr',
+]
+
+CSRF_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS  = ['hix.co.kr', 'services.hix.co.kr']
+CSRF_COOKIE_DOMAIN = '.hix.co.kr'
+
+EMAIL_ACTIVE_FIELD = 'is_active'
+EMAIL_SERVER = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_ADDRESS = '<email is here>'
+EMAIL_PASSWORD = '<email password>'
+EMAIL_FROM_ADDRESS = 'tester<test@test.com>'
+EMAIL_MAIL_SUBJECT = 'Confirm your email'
+EMAIL_MAIL_HTML = 'auth_mail.html'
+EMAIL_PAGE_TEMPLATE = 'confirm_mail.html'
+EMAIL_PAGE_DOMAIN = 'http://services.hix.co.kr/'
+
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_AGE = 120960000
+SESSION_COOKIE_DOMAIN = '.hix.co.kr'
+SESSION_COOKIE_HTTPONLY = True
+SESSION_DOMAIN_NAME = 'hix.co.kr'
+SESSION_COOKIE_SECURE = True
+
 ACCOUNT_SESSION_REMEMBER = True
 SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+USE_X_FORWARDED_HOST = True
+
+RECAPTCHA_SITE_KEY = "6LcBdgcaAAAAACT2L3b6-5uugc0W2Xlr3i62Hpq3"
+RECAPTCHA_SECRET_KEY = "6LcBdgcaAAAAAAjMT3qeFySEmu1e4yyqJCmE6Lxo"
+
 
 # ACCOUNT_EMAIL_REQUIRED = True
 

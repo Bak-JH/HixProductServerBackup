@@ -1,0 +1,13 @@
+{% extends 'product/base.html' %}
+
+{% block title %}
+<title>HiX Local Library</title>
+{% endblock %}
+
+{% block content %}
+     {% if success %}
+        You have confirmed your account!
+    {% else %}
+        Error, invalid token!
+    {% endif %}
+{% endblock %}

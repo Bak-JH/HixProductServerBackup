@@ -1,13 +1,16 @@
 import datetime
+import urllib
+import json
 
 from django.shortcuts import render
 from django.views import generic
 from django.views.decorators.http import require_GET
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
@@ -16,9 +19,16 @@ from django.urls import reverse
 from product.models import Product, ProductSerial
 from product.forms import RegisterSerialForm, LoginForm, SignupForm
 from django.db import models
+from django.conf import settings
 
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.models import SocialAccount
+
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
+from django_email_verification import sendConfirm
+from .utils import verify_recaptcha
 
 # @require_GET
 # # @login_required
@@ -89,37 +99,59 @@ def product_signup(request):
         if request.method == "POST":
             form = SignupForm(request.POST)
             if form.is_valid():
-                new_user = User.objects.create_user(**form.cleaned_data)
-                return HttpResponseRedirect(reverse('product_login'))
-
+                if verify_recaptcha(request.POST.get('g-recaptcha-response')):
+                    new_user = User.objects.create_user(**form.cleaned_data)
+                    sendConfirm(new_user)
+                    return HttpResponseRedirect(reverse('product_login'))
+                else:
+                    messages.error(request, 'Invalid reCAPTCHA. Please try again.')
+                    return HttpResponse('Invalid reCAPTCHA. Please try again')
+            return render(request, 'product/signup.html', {'form': form})                        
         #get
         else:
             form = SignupForm()
-    return render(request, 'product/signup.html', {'form': form})
-
+            context = {
+                'form': form, 
+                'key': settings.RECAPTCHA_SITE_KEY
+            }
+            return render(request, 'product/signup.html', context)
+    
 def product_login(request):
     """Checks logged in status"""
-    if request.user.is_authenticated:
-        return HttpResponseRedirect('/product/login_redirect/')
+    if request.user.is_authenticated: 
+        next_url = request.GET.get('next')
+        if next_url:
+            response = HttpResponseRedirect(next_url)
+            response.set_cookie('username', request.user.username, domain=".hix.co.kr")
+            return response   
+        else:
+            response = HttpResponseRedirect('/product/login_redirect/')
+            response.set_cookie('username', request.user.username, domain=".hix.co.kr")
+            return response
     else:
         if request.method == 'POST':
-            print(request.POST)
             form = LoginForm(request.POST)
             id = request.POST['username']
             pw = request.POST['password']
             user = authenticate(username=id, password=pw)
             if user is not None:
                 login(request, user=user)
-                
                 next_url = request.GET.get('next')
                 if next_url:
-                    return HttpResponseRedirect(next_url)
+                    response = HttpResponseRedirect(next_url)
+                    response.set_cookie('username', user.username, domain=".hix.co.kr")
+                    return response
                 else:
-                    return HttpResponseRedirect(reverse('product_login_redirect'))
+                    response = HttpResponseRedirect(reverse('product_login_redirect'))
+                    response.set_cookie('username', user.username, domain=".hix.co.kr")
+                    return response
             else:
                 try: 
                     user = User.objects.get(username=request.POST['username'])
-                    error = 'Password is incorrect'
+                    if not user.is_active:
+                        error = 'Email is not verified. Please check your email'
+                    else: 
+                        error = 'Password is incorrect'
                 except:
                     error = 'We cannot find an account with that ID'
 
@@ -134,6 +166,23 @@ def product_login(request):
             form = LoginForm()
         
         return render(request, 'product/login.html', {'form': form})
+
+@login_required(login_url="/product/login")
+def product_logout(request):
+    if request.GET.get('clicked'):
+        logout(request)
+        next_url = request.GET.get('next')
+        if next_url:
+            response = HttpResponseRedirect(next_url)
+            response.delete_cookie('username')
+            return response   
+        else:
+            response = HttpResponseRedirect('/product/login/')
+            response.delete_cookie('username')
+            return response
+    else:
+        return render(request, 'product/logout.html')
+
 
 
 @login_required(login_url="/product/login")

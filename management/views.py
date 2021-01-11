@@ -8,6 +8,12 @@ from django.contrib.auth.decorators import login_required, permission_required
 import uuid
 from datetime import date
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import permissions, status
+
+
 # Create your views here.
 
 @login_required(login_url="/product/login")
