@@ -220,7 +220,7 @@ EMAIL_ACTIVE_FIELD = 'is_active'
 EMAIL_SERVER = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_ADDRESS = 'support@hix.co.kr'
-EMAIL_PASSWORD = 'mdKm=2=B'
+EMAIL_PASSWORD = '*hix20130829'
 EMAIL_FROM_ADDRESS = 'HiX<support@hix.co.kr>'
 EMAIL_MAIL_SUBJECT = 'Confirm your email'
 EMAIL_MAIL_HTML = 'auth_mail.html'
