@@ -107,8 +107,12 @@ def product_signup(request):
                     new_user = User.objects.create_user(**form.cleaned_data)
                     return HttpResponseRedirect(reverse('product_login'))
                 else:
-                    messages.error(request, 'Invalid reCAPTCHA. Please try again.')
-                    return HttpResponse('Invalid reCAPTCHA. Please try again')
+                    error = 'Invalid reCAPTCHA. Please try again.'
+                    context = {
+                        'form': form,
+                        'error': error
+                    }
+                return render(request, 'product/signup.html', context)
             return render(request, 'product/signup.html', {'form': form})                        
         #get
         else:
