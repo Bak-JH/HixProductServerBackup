@@ -104,13 +104,13 @@ def product_signup(request):
         if request.method == "POST":
             form = SignupForm(request.POST)
             if form.is_valid():
-                if verify_recaptcha(request.POST.get('g-recaptcha-response')):
+                # if verify_recaptcha(request.POST.get('g-recaptcha-response')):
                     new_user = User.objects.create_user(**form.cleaned_data)
                     sendConfirm(new_user)
                     return HttpResponseRedirect(reverse('product_login'))
-                else:
-                    messages.error(request, 'Invalid reCAPTCHA. Please try again.')
-                    return HttpResponse('Invalid reCAPTCHA. Please try again')
+                # else:
+                #     messages.error(request, 'Invalid reCAPTCHA. Please try again.')
+                #     return HttpResponse('Invalid reCAPTCHA. Please try again')
             return render(request, 'product/signup.html', {'form': form})                        
         #get
         else:
