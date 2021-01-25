@@ -18,6 +18,8 @@ def verify_recaptcha(recaptcha_response):
     # result will be a dict containing 'success' and 'action'.
     # it is important to verify both
     
+    print(result)
+
     if (not result['success']) or (not result['action'] == 'signup'):
         return False
 
