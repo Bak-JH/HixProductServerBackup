@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.conf import settings
 from .forms import AddResinForm, AddProductSerialForm
 from resin.models import Material
-from product.models import Product, ProductSerial
+from product.models import Product, ProductSerial, ProductSerial_batch
 from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required, permission_required
 import uuid
@@ -29,7 +29,9 @@ def add_serial(request):
                 today = date.today()
                 created_date = today.strftime("%Y-%m-%d")
                 product = Product.objects.get(name=request.POST['product'])
-                serial = ProductSerial.objects.create(serial_number=UUID, product=product, expire_date=request.POST['expire_date'], created_date=created_date)
+                expire_date = request.POST['expire_date'] if request.POST['expire_date'] != "" else None
+                batch = ProductSerial_batch.objects.get(id=request.POST['batch'])
+                serial = ProductSerial.objects.create(serial_number=UUID, product=product, expire_date=expire_date, created_date=created_date, batch=batch)
                 serial.save()
                 serials.append(UUID)
 
