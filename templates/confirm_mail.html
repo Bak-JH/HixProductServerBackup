@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block content %}
-     {% if success %}
-        You have confirmed your account!
+    {% if success %}
+        {{ user.username }}, your account is confirmed!
     {% else %}
         Error, invalid token!
     {% endif %}

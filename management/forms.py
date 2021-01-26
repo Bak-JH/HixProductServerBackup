@@ -35,4 +35,4 @@ class AddProductSerialForm(forms.Form):
     product = forms.ModelChoiceField(label="Product ", queryset=Product.objects.all())
     expire_date = forms.DateField(label="Expire Date ", input_formats=['%Y-%m-%d'], widget=forms.DateInput(attrs={'readonly':'readonly'}), required=False)
     number = forms.IntegerField(label="Number to Create ", initial=0)
-    batch_name = forms.ModelChoiceField(label="Serial Batch ", queryset=ProductSerial_batch.objects.all().values_list('name'), required=False)
+    batch = forms.ModelChoiceField(label="Serial Batch ", queryset=ProductSerial_batch.objects.all(), required=False)

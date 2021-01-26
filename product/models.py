@@ -26,6 +26,8 @@ class ProductSerial_batch(models.Model):
     name = models.CharField(max_length=200, help_text="Name of the product")
     date = models.DateField(null=True, blank=True)
     tags = TaggableManager(blank=True)
+    def __str__(self):
+        return u'%s' % (self.name)
 
 class ProductSerial(models.Model):
     #Don't want to expose primary key to this table as serial number

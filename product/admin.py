@@ -53,22 +53,3 @@ class SerialBatchInstanceAdmin(admin.ModelAdmin):
 
     def tag_list(self, obj):
         return u", ".join(o.name for o in obj.tags.all())
-
-
-
-# class UserInfoInline(admin.StackedInline):
-#     model = ProductSerial_batch
-#     field = ('tag_list')
-
-#     def get_queryset(self, request):
-#         return super().get_queryset(request).prefetch_related('tags')
-    
-#     def tag_list(self, obj):
-#         return u", ".join(o.name for o in obj.tags.all())
-
-# class UserInstanceAdmin(admin.ModelAdmin):
-#     inlines = [UserInfoInline]
-#     list_display = ('username', 'email', 'is_active', 'tag_list')
-
-#     def tag_list(self, obj):
-#         return UserInfoInline.tag_list(self, UserInfo.objects.get(user=obj))
