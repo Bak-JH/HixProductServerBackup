@@ -2,7 +2,7 @@ import datetime
 
 
 from django import forms
-from product.models import Product
+from product.models import Product, ProductSerial_batch
 from datetime import date
 
 # resin manager
@@ -33,6 +33,6 @@ class AddProductSerialForm(forms.Form):
         super(AddProductSerialForm, self).__init__(*args, **kwargs)
 
     product = forms.ModelChoiceField(label="Product ", queryset=Product.objects.all())
-    expire_date = forms.DateField(label="Expire Date ", input_formats=['%Y-%m-%d'], widget=forms.DateInput(attrs={'readonly':'readonly'}))
+    expire_date = forms.DateField(label="Expire Date ", input_formats=['%Y-%m-%d'], widget=forms.DateInput(attrs={'readonly':'readonly'}), required=False)
     number = forms.IntegerField(label="Number to Create ", initial=0)
-
+    batch = forms.ModelChoiceField(label="Serial Batch ", queryset=ProductSerial_batch.objects.all(), required=False)
