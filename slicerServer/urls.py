@@ -34,6 +34,7 @@ urlpatterns = [
     path('setup/', include('setup.urls')),
     path('post/', include('posts.urls')),
     path('email/', include(mail_urls)),
+    path('taggit_autosuggest/', include('taggit_autosuggest.urls')),
 ]
 
 

@@ -21,11 +21,22 @@ class SerialBatchInline(admin.StackedInline):
 
 @admin.register(ProductSerial)
 class ProductSerialInstanceAdmin(admin.ModelAdmin):
-    list_display = ('serial_number', 'owner', 'product', 'created_date', 'expire_date', 'tag')
+    list_display = ('serial_number', 'owner', 'product', 'created_date', 'expire_date', 'batch_name', 'batch_date', 'tag')
     list_filter = ('serial_number', 'owner', 'product', 'created_date', 'expire_date')
 
-    def tag(self, obj):
+    def batch_name(self, obj):
         return SerialBatchInline.batch_name(self, obj.batch)
+
+    def batch_date(self, obj):
+        return SerialBatchInline.batch_date(self, obj.batch)
+
+    def tag(self, obj):
+        return SerialBatchInline.tag_list(self, obj.batch)
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super(ProductSerialInstanceAdmin, self).get_form(request, obj, **kwargs)
+        form.base_fields['batch'].label_from_instance = lambda obj: "{}".format(obj.name)
+        return form
 
 @admin.register(Product)
 class ProductInstanceAdmin(admin.ModelAdmin):

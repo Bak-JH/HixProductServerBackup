@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from taggit.managers import TaggableManager
+from taggit_autosuggest.managers import TaggableManager
 
 import uuid
 
@@ -25,7 +25,7 @@ class Product(models.Model):
 class ProductSerial_batch(models.Model):
     name = models.CharField(max_length=200, help_text="Name of the product")
     date = models.DateField(null=True, blank=True)
-    tags = TaggableManager()
+    tags = TaggableManager(blank=True)
 
 class ProductSerial(models.Model):
     #Don't want to expose primary key to this table as serial number

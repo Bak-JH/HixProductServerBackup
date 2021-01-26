@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'resin',
     'posts',
     'taggit',
+    'taggit_autosuggest',
 ]
 
 MIDDLEWARE = [
