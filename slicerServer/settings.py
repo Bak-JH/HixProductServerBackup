@@ -218,13 +218,13 @@ CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS  = ['hix.co.kr', 'services.hix.co.kr']
 CSRF_COOKIE_DOMAIN = '.hix.co.kr'
 
+EMAIL_FROM_ADDRESS = 'HiX<support@hix.co.kr>'
 EMAIL_ACTIVE_FIELD = 'is_active'
 EMAIL_SERVER = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_ADDRESS = 'support@hix.co.kr'
 EMAIL_PASSWORD = '*hix20130829'
 
-EMAIL_FROM_ADDRESS = 'HiX<support@hix.co.kr>'
 EMAIL_MAIL_SUBJECT = 'Confirm your email'
 EMAIL_MAIL_HTML = 'auth_mail.html'
 # EMAIL_MAIL_PLAIN = 'auth_mail.txt'
