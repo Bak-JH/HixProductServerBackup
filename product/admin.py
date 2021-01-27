@@ -11,13 +11,19 @@ class SerialBatchInline(admin.StackedInline):
         return super().get_queryset(request).prefetch_related('tags')
 
     def batch_name(self, obj):
-        return obj.name
+        if obj:
+            return obj.name
+        return ""
 
     def batch_date(self,obj):
-        return obj.date
+        if obj:
+            return obj.date
+        return ""
 
     def tag_list(self, obj):
-        return u", ".join(o.name for o in obj.tags.all())
+        if obj:
+            return u", ".join(o.name for o in obj.tags.all())
+        return ""
 
 @admin.register(ProductSerial)
 class ProductSerialInstanceAdmin(admin.ModelAdmin):
