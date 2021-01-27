@@ -15,12 +15,6 @@
             pg: 'kcp',
             method: 'card_rebill', // 빌링키를 받기 위한 결제 수단
             show_agree_window: 0, // 부트페이 정보 동의 창 보이기 여부
-            user_info: {
-                username: '사용자 이름',
-                email: '사용자 이메일',
-                addr: '사용자 주소',
-                phone: '010-1234-4567'
-            },
             order_id: '고유order_id_1234' //고유 주문번호로, 생성하신 값을 보내주셔야 합니다.
         }).error(function (data) {
             //결제 진행시 에러가 발생하면 수행됩니다.

@@ -27,7 +27,7 @@ from allauth.socialaccount.models import SocialAccount
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 
-from django_email_verification import send_email
+from django_email_verification import sendConfirm
 from .utils import verify_recaptcha
 
 # @require_GET
@@ -107,7 +107,7 @@ def product_signup(request):
                 if verify_recaptcha(request.POST.get('g-recaptcha-response')):
                     new_user = User.objects.create_user(**form.cleaned_data)
                     new_user.is_active = False
-                    send_email(new_user)
+                    sendConfirm(new_user)
                     return HttpResponseRedirect(reverse('product_login'))
                 else:
                     error = 'Invalid reCAPTCHA. Please try again.'
