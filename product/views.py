@@ -23,6 +23,11 @@ from django.conf import settings
 
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.signals import pre_social_login
+from allauth.exceptions import ImmediateHttpResponse
+from django.dispatch import receiver
+from allauth.account.utils import perform_login
+
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -213,3 +218,13 @@ def on_signup(request, user, **kwargs):
         user.save()
 
 user_signed_up.connect(on_signup)
+
+@receiver(pre_social_login)
+def link_to_local_user(sender, request, sociallogin, **kwargs):
+    email_address = sociallogin.account.extra_data['email']
+    try:
+        user = User.objects.get(email=email_address)
+        raise ImmediateHttpResponse(perform_login(request, user, email_verification='optional'))
+    except User.DoesNotExist:
+        pass
+    
