@@ -218,26 +218,27 @@ CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS  = ['hix.co.kr', 'services.hix.co.kr']
 CSRF_COOKIE_DOMAIN = '.hix.co.kr'
 
-
-def verified_callback(user):
-    user.is_active = True
-
-EMAIL_VERIFIED_CALLBACK = verified_callback
 EMAIL_FROM_ADDRESS = 'HiX<support@hix.co.kr>'
+EMAIL_ACTIVE_FIELD = 'is_active'
+EMAIL_SERVER = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_ADDRESS = 'support@hix.co.kr'
+EMAIL_PASSWORD = '*hix20130829'
+
 EMAIL_MAIL_SUBJECT = 'Confirm your email'
 EMAIL_MAIL_HTML = 'auth_mail.html'
-EMAIL_MAIL_PLAIN = 'auth_mail.txt'
-EMAIL_TOKEN_LIFE = 60 * 3
+# EMAIL_MAIL_PLAIN = 'auth_mail.txt'
+# EMAIL_TOKEN_LIFE = 60 * 3
 EMAIL_PAGE_TEMPLATE = 'confirm_mail.html'
 EMAIL_PAGE_DOMAIN = 'http://services.hix.co.kr/'
 
-# For Django Email Backend
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'support@hix.co.kr'
-EMAIL_HOST_PASSWORD = '*hix20130829'
-EMAIL_USE_TLS = True
+# # For Django Email Backend
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'support@hix.co.kr'
+# EMAIL_HOST_PASSWORD = '*hix20130829'
+# EMAIL_USE_TLS = True
 
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_AGE = 120960000

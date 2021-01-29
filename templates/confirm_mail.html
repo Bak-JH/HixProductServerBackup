@@ -6,7 +6,8 @@
 
 {% block content %}
     {% if success %}
-        {{ user.username }}, your account is confirmed!
+        {% comment %} {{ user.username }}, {% endcomment %}
+        your account is confirmed!
     {% else %}
         Error, invalid token!
     {% endif %}
