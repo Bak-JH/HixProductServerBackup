@@ -5,11 +5,13 @@ import json
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 import time
+from .models import BillingInfo
 
 # Create your views here.
 @login_required(login_url="/product/login")
 def subscribe(request):
     billing_id = request.GET.get('id')
+    print(request.user)
     if billing_id:
         print(billing_id)
         bootpay = BootpayApi('59a4d32b396fa607c2e75e00', 't3UENPWvsUort5WG0BFVk2+yBzmlt3UDvhDH2Uwp0oA=')
@@ -31,8 +33,11 @@ def subscribe(request):
                     '[[ feedback_url ]]'
                 )
         receipt = result['data']['receipt_url']
-        print(reserve)
-        return HttpResponseRedirect(receipt)
+        print(request.user)
+        print(resreve)
+        current_user = User.objects.get(username=request.user)
+        BillingInfo.objects.create(billing_key=billing_id, user=current_user)
+        return HttpResponse(receipt)
     else:
         return render(request, 'subscribe.html')
 
