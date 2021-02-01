@@ -87,18 +87,13 @@ def register(req):
 
     # If this is a GET (or any other method) create the default form.
     else:
-        #logout
-        if req.GET.get('clicked'):
-            return product_logout(req)
-            
-        else: 
-            form = RegisterSerialForm(user=req.user)
-            context = {
-                'form': form,
-                'user': req.user,
-            }
-            return render(req, 'product/register_serial.html', context)
-    
+        form = RegisterSerialForm(user=req.user)
+        context = {
+            'form': form,
+            'user': req.user,
+        }
+        return render(req, 'product/register_serial.html', context)
+
     return HttpResponseRedirect(reverse('registration_done'))
 
 def product_signup(request):

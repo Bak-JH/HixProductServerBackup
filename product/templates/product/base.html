@@ -17,8 +17,19 @@
       <div class="row justify-content-center">
         <div class="col-8">
           {% comment %} <h1 class="mt-2">HiX</h1> {% endcomment %}
-          <img src="{% static "product/logo-blue.png" %}" alt="logo">
-          <hr class="mt-0 mb-4">
+          <div class="row d-flex align-items-center justify-content-lg-between">
+            <img src="{% static "product/logo-blue.png" %}" alt="logo">
+            {% if user.is_authenticated %}
+              <div>
+                <form action="/product/logout" method="get">
+                  <button class="btn btn-secondary" type="submit" value="True" name='clicked' onclick="location.href ='/product/logout'">
+                      Logout
+                  </button>
+                </form>
+              </div>
+            {% endif %}
+          </div>
+          <hr class="mt-4 mb-3">
           {% block content %}
           {% endblock %}
         </div>
