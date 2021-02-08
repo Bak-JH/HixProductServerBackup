@@ -1,57 +1,83 @@
 from django.shortcuts import render
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse, Http404, HttpResponseServerError
+from .forms import CancelForm
 from lib.BootpayApi import BootpayApi
 import json 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 import time
-from .models import BillingInfo
+from .models import BillingInfo, PaymentHistory, PricingPolicy
+from product.models import Product, ProductSerial
 # from django.views.decorators.csrf import csrf_exempt
 
+def load_bootpay():
+    bootpay = BootpayApi('59a4d32b396fa607c2e75e00', 't3UENPWvsUort5WG0BFVk2+yBzmlt3UDvhDH2Uwp0oA=')
+    bootpay.response = access_token = bootpay.get_access_token()
+    return bootpay
 
-# Create your views here.
-# @csrf_exempt
+def billing_bootpay(bootpay, billing_id, product_name, price, order_id, userinfo):
+    result = bootpay.subscribe_billing(
+                        billing_id, product_name, 
+                        price,      order_id, 
+                        [],         userinfo
+                    )
+    return result['data'] if result['status'] is 200 else None
+
+def save_billingInfo(billing_id, card_name, card_number):
+    card_number = card_number[-4:]
+    return BillingInfo(billing_key=billing_id, 
+                       card_name=card_name, 
+                       card_number=card_number)
+
+def find_free_serial(product):
+    return ProductSerial.objects.filter(product=product ,owner=None)
+
+def save_receipt(receipt_id, receipt_url, purchased_at, serial_number):
+    purchased_at = purchased_at if purchased_at is not None else None
+    serial = ProductSerial.objects.get(serial_number=serial_number)
+    return PaymentHistory(receipt_id, receipt_url, purchased_at, serial)
+
 @login_required(login_url="/product/login")
 def subscribe(request):
+    try:
+        product = Product.objects.get(name=request.GET.get('product'))
+        policy = PricingPolicy.objects.get(product=product)
+    except:
+        raise Http404('Product Not Exist')
+
     if request.method == 'POST':
-        billing_id = ""request.POST['billing_id']
-        print(request.POST)
-        bootpay = BootpayApi('59a4d32b396fa607c2e75e00', 't3UENPWvsUort5WG0BFVk2+yBzmlt3UDvhDH2Uwp0oA=')
-        access_token = bootpay.get_access_token()
-        result = bootpay.subscribe_billing(
-                    billing_id, 
-                    '테스트', 
-                    1000, 
-                    'id_dent1', 
-                    [], 
-                    {'username': 'test'}
-                )
-        reserve = bootpay.subscribe_billing_reserve(
-                    billing_id,
-                    '테스트 예약',
-                    3000,
-                    'id_dent1',
-                    time.time() + 30, # 30초 뒤 실행
-                    'https://services.hix.co.kr/order/callback'
-                )
-        print(result)
-        receipt = result['data']['receipt_url']
-        print(request.user)
-        print(reserve)
-        current_user = User.objects.get(username=request.user)
-        BillingInfo.objects.create(billing_key=billing_id, user=current_user)
-        return JsonResponse({'receipt_url': receipt})
+        billing_id = request.POST['billing_id']
+        bootpay = load_bootpay()
+        if bootpay.response['status'] is 200 :
+            result = billing_bootpay(
+                        bootpay,
+                        billing_id, 
+                        policy.product.name, 
+                        policy.price,
+                        request.POST['order_id'],
+                        {'username': request.user.username, 'email': request.user.email}
+                    )
+
+            save_billingInfo(billing_id, result['card_name'], result['card_no'])
+            print(find_free_serial(product))
+            save_receipt(result['receipt_id'], result['receipt_url'],
+                        result['purchased_at'], find_free_serial(product)[0])
+            return JsonResponse({'receipt_url': receipt})
+        
+        else:
+            return HttpResponseServerError()
     else:
         return render(request, 'order/subscribe.html')
 
 @login_required(login_url="/product/login")
-def cancel_subscribe(request, billing_id):
-    print(billing_id)
-    bootpay = BootpayApi('59a4d32b396fa607c2e75e00', 't3UENPWvsUort5WG0BFVk2+yBzmlt3UDvhDH2Uwp0oA=')
-    response = bootpay.get_access_token()
-    if response['status'] is 200:
-        print(bootpay.destroy_subscribe_billing_key(billing_id))
-        return HttpResponse(bootpay.destroy_subscribe_billing_key(billing_id))
+def cancel_payment(request, billing_id):
+    if request.method == "POST":
+        bootpay = load_bootpay()
+        if bootpay.response['status'] is 200:
+            result = bootpay.cancel(billing_id, '', request.POST['cancel_user'], request.POST['cancel_reason'])
+            return HttpResponse()
+    else:
+        return render(request, 'order/cancel_payment.html', {'form': CancelForm})
 
 def callback(request):
     print(request.body)

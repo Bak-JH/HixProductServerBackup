@@ -105,6 +105,13 @@ def product_signup(request):
             form = SignupForm(request.POST)
             if form.is_valid():
                 if verify_recaptcha(request.POST.get('g-recaptcha-response')):
+                    if User.objects.get(form.cleaned_data['email']) is not None:
+                        error = 'Email already exists. Try again with another email'
+                        context = {
+                            'form': form,
+                            'error': error
+                        }
+                        return render(request, 'product/signup.html', context)
                     new_user = User.objects.create_user(**form.cleaned_data)
                     new_user.is_active = False
                     sendConfirm(new_user)
@@ -202,6 +209,10 @@ def product_login_redirect(req):
 @login_required(login_url="/product/login")
 def registration_done(req):
     return render(req, 'product/registration_done.html')
+
+def find_id(request):
+    if request.method is 'POST':
+        User.objects.get(email=request.POST['email'])
 
 
 def on_signup(request, user, **kwargs):
