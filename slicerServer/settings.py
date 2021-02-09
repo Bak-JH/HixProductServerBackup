@@ -233,12 +233,12 @@ EMAIL_PAGE_TEMPLATE = 'confirm_mail.html'
 EMAIL_PAGE_DOMAIN = 'http://services.hix.co.kr/'
 
 # # For Django Email Backend
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'support@hix.co.kr'
-# EMAIL_HOST_PASSWORD = '*hix20130829'
-# EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'support@hix.co.kr'
+EMAIL_HOST_PASSWORD = '*hix20130829'
+EMAIL_USE_TLS = True
 
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_AGE = 120960000
