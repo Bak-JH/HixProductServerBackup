@@ -16,8 +16,8 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import MultipleObjectsReturned 
 from django.urls import reverse
-from product.models import Product, ProductSerial
-from product.forms import RegisterSerialForm, LoginForm, SignupForm
+from .models import Product, ProductSerial
+from .forms import *
 from django.db import models
 from django.conf import settings
 
@@ -96,6 +96,12 @@ def register(req):
 
     return HttpResponseRedirect(reverse('registration_done'))
 
+def get_user_with_email(email):
+    try:
+        return User.objects.get(email=email)
+    except User.DoesNotExist:
+        return None
+
 def product_signup(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect('/product/login_redirect/')
@@ -105,6 +111,13 @@ def product_signup(request):
             form = SignupForm(request.POST)
             if form.is_valid():
                 if verify_recaptcha(request.POST.get('g-recaptcha-response')):
+                    if get_user_with_email(form.cleaned_data['email']) is not None:
+                        error = 'Email already exists. Try again with another email'
+                        context = {
+                            'form': form,
+                            'error': error
+                        }
+                        return render(request, 'product/signup.html', context)
                     new_user = User.objects.create_user(**form.cleaned_data)
                     new_user.is_active = False
                     sendConfirm(new_user)
@@ -202,7 +215,6 @@ def product_login_redirect(req):
 @login_required(login_url="/product/login")
 def registration_done(req):
     return render(req, 'product/registration_done.html')
-
 
 def on_signup(request, user, **kwargs):
     social_user = SocialAccount.objects.get(user=user)

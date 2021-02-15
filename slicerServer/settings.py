@@ -15,11 +15,20 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import sys
+import json
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__name__)))
 UPDATE_FILE_DIR = os.path.join(BASE_DIR, 'SetupFiles')
+
+# secret keys in here
+SECRETS_PATH = os.path.join(BASE_DIR, 'secrets.json')
+secrets = json.loads(open(SECRETS_PATH).read())
+
+for key, value in secrets.items():
+    setattr(sys.modules[__name__], key, value)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -223,7 +232,6 @@ EMAIL_ACTIVE_FIELD = 'is_active'
 EMAIL_SERVER = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_ADDRESS = 'support@hix.co.kr'
-EMAIL_PASSWORD = '*hix20130829'
 
 EMAIL_MAIL_SUBJECT = 'Confirm your email'
 EMAIL_MAIL_HTML = 'auth_mail.html'
@@ -233,12 +241,11 @@ EMAIL_PAGE_TEMPLATE = 'confirm_mail.html'
 EMAIL_PAGE_DOMAIN = 'http://services.hix.co.kr/'
 
 # # For Django Email Backend
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'support@hix.co.kr'
-# EMAIL_HOST_PASSWORD = '*hix20130829'
-# EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'support@hix.co.kr'
+EMAIL_USE_TLS = True
 
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_AGE = 120960000
