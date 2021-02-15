@@ -19,9 +19,9 @@ def view_post(request, post_id):
 def post_list(request):
     post_category = request.GET.get('category')
     if post_category is not None:
-        posts = Post.objects.filter(category=post_category)[0:10]
+        posts = Post.objects.filter(category=post_category)
     else:
-        posts = Post.objects.all()[0:10]
+        posts = Post.objects.all()
     serializer = ViewPostSerializer(posts, many=True)
     return Response(serializer.data)
 
