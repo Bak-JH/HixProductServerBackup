@@ -20,7 +20,8 @@ class PaymentTest(TestCase):
         cls.order_id = toJson(cls, uuid.uuid4())
         cls.product = Product.objects.create(name='test')
         cls.user = User.objects.create_user('bootpaytest', 'test@tester.com', 'tester') 
-        cls.recipt_id = []
+        cls.receipt_id = []
+        cls.receipt_url = []
 
     def setUp(cls):
         ProductSerial.objects.create(product=cls.product, owner=None)
@@ -44,6 +45,8 @@ class PaymentTest(TestCase):
         
         print("==================== test_bootpay_billing ====================\n")
         print(result, '\n')
+        self.receipt_id.append(result['receipt_id'])
+        self.receipt_url.append(result['receipt_url'])
         print('--------------------------------------------------------------\n\n')
 
         self.assertIsNotNone(result)
@@ -68,14 +71,14 @@ class PaymentTest(TestCase):
 
     def test_receipt_save(self):
         serial = find_free_serial(self.product)[0]
-        result = save_receipt('601cf36dd8c1bd0044f68427', 'https://bit.ly/3cHRgvj', timezone.now(), serial.serial_number)
+        result = save_receipt(''.join(self.receipt_id), ''.join(self.receipt_url), timezone.now(), serial.serial_number)
 
         print("==================== test_receipt_save ====================\n")
         print(serial.serial_number)
         print(result.receipt_id, result.receipt_url, result.date, '\n')
         print('--------------------------------------------------------------\n\n')
 
-        self.recipt_id.append(result.receipt_id)
+        self.receipt_id.append(result.receipt_id)
         self.assertIsNotNone(result)
 
     def test_refund(self):
