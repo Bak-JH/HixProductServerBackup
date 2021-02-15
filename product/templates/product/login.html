@@ -3,8 +3,9 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-<title>HiX Local Library</title>
+  HiX Local Library
 {% endblock %}
+
 {% block content %}
   {% if user.is_authenticated %}
     <p>Already logged in {{ user.username }}, close browser</p> 
@@ -33,6 +34,11 @@
     <div class='form-row'>
       <a class="btn btn-secondary w-100 m-1" href="/product/signup" role="button">
         Sign up
+      </a>
+    </div>
+    <div class='form-row'>
+      <a class="btn btn-link w-100 m-1" href="/accounts/password/reset" role="button">
+        Forgot your account?
       </a>
     </div>
   {% endif %}

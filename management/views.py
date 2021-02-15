@@ -30,7 +30,7 @@ def add_serial(request):
                 created_date = today.strftime("%Y-%m-%d")
                 product = Product.objects.get(name=request.POST['product'])
                 expire_date = request.POST['expire_date'] if request.POST['expire_date'] != "" else None
-                batch = ProductSerial_batch.objects.get(id=request.POST['batch'])
+                batch = ProductSerial_batch.objects.get(id=request.POST['batch']) if request.POST['batch'] != "" else None
                 serial = ProductSerial.objects.create(serial_number=UUID, product=product, expire_date=expire_date, created_date=created_date, batch=batch)
                 serial.save()
                 serials.append(UUID)

@@ -76,7 +76,7 @@
                 method: 'POST',
                 mode: 'same-origin',  // Do not send CSRF token to another domain.
                 body: formData
-            }).then(response => response.json())
+            })
             .then(data => {
                 console.log(data)
                 window.open(data['receipt_url'], '_blank', 'resizable=1, width=500, height=825')

@@ -8,11 +8,12 @@ from django.contrib.auth.decorators import login_required
 import time
 from .models import BillingInfo, PaymentHistory, PricingPolicy
 from product.models import Product, ProductSerial
+from django.core.mail import send_mail
 # from django.views.decorators.csrf import csrf_exempt
 
 def load_bootpay():
     bootpay = BootpayApi('59a4d32b396fa607c2e75e00', 't3UENPWvsUort5WG0BFVk2+yBzmlt3UDvhDH2Uwp0oA=')
-    bootpay.response = access_token = bootpay.get_access_token()
+    bootpay.response = bootpay.get_access_token()
     return bootpay
 
 def billing_bootpay(bootpay, billing_id, product_name, price, order_id, userinfo):
@@ -36,6 +37,9 @@ def save_receipt(receipt_id, receipt_url, purchased_at, serial_number):
     purchased_at = purchased_at if purchased_at is not None else None
     serial = ProductSerial.objects.get(serial_number=serial_number)
     return PaymentHistory(receipt_id, receipt_url, purchased_at, serial)
+
+def send_receipt(url, email):
+    print('test')
 
 @login_required(login_url="/product/login")
 def subscribe(request):
@@ -62,7 +66,7 @@ def subscribe(request):
             print(find_free_serial(product))
             save_receipt(result['receipt_id'], result['receipt_url'],
                         result['purchased_at'], find_free_serial(product)[0])
-            return JsonResponse({'receipt_url': receipt})
+            return HttpResponseRedirect(result['receipt_url'])
         
         else:
             return HttpResponseServerError()

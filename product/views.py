@@ -16,13 +16,18 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
 from django.core.exceptions import MultipleObjectsReturned 
 from django.urls import reverse
-from product.models import Product, ProductSerial
-from product.forms import RegisterSerialForm, LoginForm, SignupForm
+from .models import Product, ProductSerial
+from .forms import *
 from django.db import models
 from django.conf import settings
 
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.models import SocialAccount
+from allauth.socialaccount.signals import pre_social_login
+from allauth.exceptions import ImmediateHttpResponse
+from django.dispatch import receiver
+from allauth.account.utils import perform_login
+
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -82,19 +87,20 @@ def register(req):
 
     # If this is a GET (or any other method) create the default form.
     else:
-        #logout
-        if req.GET.get('clicked'):
-            return product_logout(req)
-            
-        else: 
-            form = RegisterSerialForm(user=req.user)
-            context = {
-                'form': form,
-                'user': req.user,
-            }
-            return render(req, 'product/register_serial.html', context)
-    
+        form = RegisterSerialForm(user=req.user)
+        context = {
+            'form': form,
+            'user': req.user,
+        }
+        return render(req, 'product/register_serial.html', context)
+
     return HttpResponseRedirect(reverse('registration_done'))
+
+def get_user_with_email(email):
+    try:
+        return User.objects.get(email=email)
+    except User.DoesNotExist:
+        return None
 
 def product_signup(request):
     if request.user.is_authenticated:
@@ -105,7 +111,7 @@ def product_signup(request):
             form = SignupForm(request.POST)
             if form.is_valid():
                 if verify_recaptcha(request.POST.get('g-recaptcha-response')):
-                    if User.objects.get(form.cleaned_data['email']) is not None:
+                    if get_user_with_email(form.cleaned_data['email']) is not None:
                         error = 'Email already exists. Try again with another email'
                         context = {
                             'form': form,
@@ -210,11 +216,6 @@ def product_login_redirect(req):
 def registration_done(req):
     return render(req, 'product/registration_done.html')
 
-def find_id(request):
-    if request.method is 'POST':
-        User.objects.get(email=request.POST['email'])
-
-
 def on_signup(request, user, **kwargs):
     social_user = SocialAccount.objects.get(user=user)
     provider = social_user.get_provider()
@@ -224,3 +225,13 @@ def on_signup(request, user, **kwargs):
         user.save()
 
 user_signed_up.connect(on_signup)
+
+@receiver(pre_social_login)
+def link_to_local_user(sender, request, sociallogin, **kwargs):
+    email_address = sociallogin.account.extra_data['email']
+    try:
+        user = User.objects.get(email=email_address)
+        raise ImmediateHttpResponse(perform_login(request, user, email_verification='optional'))
+    except User.DoesNotExist:
+        pass
+    
