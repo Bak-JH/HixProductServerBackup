@@ -9,6 +9,8 @@ import time
 from .models import BillingInfo, PaymentHistory, PricingPolicy
 from product.models import Product, ProductSerial
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 # from django.views.decorators.csrf import csrf_exempt
 
 def load_bootpay():
@@ -31,15 +33,28 @@ def save_billingInfo(billing_id, card_name, card_number):
                        card_number=card_number)
 
 def find_free_serial(product):
-    return ProductSerial.objects.filter(product=product ,owner=None)
+    return ProductSerial.objects.filter(product=product, owner=None)
 
-def save_receipt(receipt_id, receipt_url, purchased_at, serial_number):
+def save_receipt(receipt_id, receipt_url, purchased_at, serial):
     purchased_at = purchased_at if purchased_at is not None else None
-    serial = ProductSerial.objects.get(serial_number=serial_number)
+    serial = ProductSerial.objects.get(serial_number=serial.serial_number)
     return PaymentHistory(receipt_id, receipt_url, purchased_at, serial)
 
 def send_receipt(url, email):
-    print('test')
+    print(url)
+    print(email)
+
+    msg_html = render_to_string('order/receipt.html', {'receipt_url': url})
+
+    result = send_mail(
+        'Receipt from HiX',
+        '',
+        'HiX<support@hix.co.kr>',
+        [email],
+        html_message=msg_html
+    )
+
+    return result
 
 @login_required(login_url="/product/login")
 def subscribe(request):
@@ -63,11 +78,11 @@ def subscribe(request):
                     )
 
             save_billingInfo(billing_id, result['card_name'], result['card_no'])
-            print(find_free_serial(product))
             save_receipt(result['receipt_id'], result['receipt_url'],
                         result['purchased_at'], find_free_serial(product)[0])
-            return HttpResponseRedirect(result['receipt_url'])
-        
+            send_receipt(result['receipt_url'], request.user.email)
+
+            return JsonResponse({'receipt_url': result['receipt_url']})
         else:
             return HttpResponseServerError()
     else:
@@ -83,6 +98,3 @@ def cancel_payment(request, billing_id):
     else:
         return render(request, 'order/cancel_payment.html', {'form': CancelForm})
 
-def callback(request):
-    print(request.body)
-    return HttpResponse("OK")

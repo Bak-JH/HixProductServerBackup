@@ -5,7 +5,7 @@ import uuid
 from uuid import UUID
 from django.contrib.auth.models import User
 from django.utils import timezone
-
+from django.core import mail
 
 def toJson(self, o):
     if isinstance(o, UUID): return str(o)
@@ -71,7 +71,7 @@ class PaymentTest(TestCase):
 
     def test_receipt_save(self):
         serial = find_free_serial(self.product)[0]
-        result = save_receipt(''.join(self.receipt_id), ''.join(self.receipt_url), timezone.now(), serial.serial_number)
+        result = save_receipt(''.join(self.receipt_id), ''.join(self.receipt_url), timezone.now(), serial)
 
         print("==================== test_receipt_save ====================\n")
         print(serial.serial_number)
@@ -94,4 +94,16 @@ class PaymentTest(TestCase):
         print('--------------------------------------------------------------\n\n')
 
         self.assertEqual(result['status'], 200)
+
+    def test_sendmail(self):
+        print("==================== test_sendmail ====================\n")
+        print(send_receipt('https://bit.ly/3jM6Rf2', 'bakjh.6280@gmail.com'))
+        print('--------------------------------------------------------------\n\n')
+        
+        self.assertEqual(len(mail.outbox), 1)
+        # Test that one message has been sent.
+        self.assertEqual(len(mail.outbox), 1)
+
+        # Verify that the subject of the first message is correct.
+        self.assertEqual(mail.outbox[0].subject, 'Here is your receipt from HiX')
 
