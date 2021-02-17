@@ -6,6 +6,14 @@ from uuid import UUID
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core import mail
+import random
+from .tasks import say_hello
+
+class CeleryTest(TestCase):
+    @classmethod
+    def test(self):
+        result = say_hello()
+        print ("test: " , result)
 
 def toJson(self, o):
     if isinstance(o, UUID): return str(o)

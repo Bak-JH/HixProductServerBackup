@@ -1,4 +1,5 @@
 from __future__ import absolute_import, unicode_literals
+from datetime import timedelta
 
 
 
@@ -63,6 +64,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'rest_framework',
     'django_email_verification',
+    'celery',
+    'django_celery_beat',
 
     'slicerServer',
     'product',
@@ -222,10 +225,11 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'https://hix.co.kr',
     'https://services.hix.co.kr',
+    'https://test.com'
 ]
 
 CSRF_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS  = ['hix.co.kr', 'services.hix.co.kr']
+CSRF_TRUSTED_ORIGINS  = ['hix.co.kr', 'services.hix.co.kr', 'test.com']
 CSRF_COOKIE_DOMAIN = '.hix.co.kr'
 
 # for django-email-verification
@@ -265,4 +269,7 @@ ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
 
 # ACCOUNT_EMAIL_REQUIRED = True
 
-
+#celery settings
+BROKER_URL = 'django://'
+CELERY_TIMEZONE = 'Asia/Seoul'
+CELERY_ENABLE_UTC=False
