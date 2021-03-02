@@ -1,19 +1,13 @@
-from order.views import *
-from django.test import TestCase, Client
-from lib.BootpayApi import BootpayApi
+from django.test import TestCase, override_settings
 import uuid
-from uuid import UUID
+from uuid import UUID, uuid4
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core import mail
-import random
-from .tasks import say_hello
-
-class CeleryTest(TestCase):
-    @classmethod
-    def test(self):
-        result = say_hello()
-        print ("test: " , result)
+from .models import *
+from .tasks import *
+from .utils import *
+from order.tasks import app
 
 def toJson(self, o):
     if isinstance(o, UUID): return str(o)
@@ -34,6 +28,7 @@ class PaymentTest(TestCase):
     def setUp(cls):
         ProductSerial.objects.create(product=cls.product, owner=None)
         ProductSerial.objects.create(product=cls.product, owner=None)
+        PricingPolicy.objects.create(product=cls.product, price=1000)
 
     def test_bootpay_load(self):
         bootpay = load_bootpay()
@@ -92,12 +87,12 @@ class PaymentTest(TestCase):
     def test_refund(self):
         bootpay = load_bootpay()
         if bootpay.response['status'] is 200:
-            result = bootpay.cancel(self.recipt_id, '', 'tester', 'just')
+            result = bootpay.cancel(self.receipt_id, '', 'tester', 'just')
         else:
             result = None
 
         print("==================== test_refund ====================\n")
-        print(self.recipt_id)
+        print(self.receipt_id)
         print(result, '\n')
         print('--------------------------------------------------------------\n\n')
 
@@ -105,7 +100,7 @@ class PaymentTest(TestCase):
 
     def test_sendmail(self):
         print("==================== test_sendmail ====================\n")
-        print(send_receipt('https://bit.ly/3jM6Rf2', 'bakjh.6280@gmail.com'))
+        print(send_receipt('https://bit.ly/3jM6Rf2', 'bakjh.6280@gmail.com', find_free_serial(self.product)[0]))
         print('--------------------------------------------------------------\n\n')
         
         self.assertEqual(len(mail.outbox), 1)
@@ -113,5 +108,5 @@ class PaymentTest(TestCase):
         self.assertEqual(len(mail.outbox), 1)
 
         # Verify that the subject of the first message is correct.
-        self.assertEqual(mail.outbox[0].subject, 'Here is your receipt from HiX')
+        self.assertEqual(mail.outbox[0].subject, 'Receipt from HiX')
 

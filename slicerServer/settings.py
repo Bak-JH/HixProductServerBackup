@@ -269,7 +269,6 @@ ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
 
 # ACCOUNT_EMAIL_REQUIRED = True
 
-#celery settings
-BROKER_URL = 'django://'
+#celery settingse
 CELERY_TIMEZONE = 'Asia/Seoul'
 CELERY_ENABLE_UTC=False
