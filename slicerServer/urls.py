@@ -21,6 +21,10 @@ from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
 from django_email_verification import urls as mail_urls
+from django.contrib import admin
+
+admin.autodiscover()
+admin.site.enable_nav_sidebar = False
 
 urlpatterns = [
     path('admin/', admin.site.urls),
