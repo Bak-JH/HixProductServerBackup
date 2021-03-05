@@ -1,0 +1,19 @@
+{% extends 'product/base.html' %}
+
+{% block title %}
+    HiX Local Library
+{% endblock %}
+
+{% block content %}
+    {% if not refund %}
+        <h1>Your order has completed</h1>
+        Thanks for your order.
+    {% else %}
+        <h1>Your refund has completed</h1>
+    {% endif %}
+
+    <p></p>
+    <a class="btn btn-outline-primary w-100 m-1" href="/" role="button">
+        Back To Home
+    </a>
+{% endblock %}

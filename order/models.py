@@ -13,7 +13,9 @@ class PaymentHistory(models.Model):
     receipt_id = models.CharField(primary_key=True, unique=True, max_length=100)
     receipt_url = models.TextField()
     date = models.DateTimeField(default=timezone.now)
-    serial = models.ForeignKey('product.ProductSerial', on_delete=models.SET_NULL, null=True)
+    serial = models.ForeignKey('product.ProductSerial', on_delete=models.SET_NULL, null=True, blank=True)
+    billing_info = models.ForeignKey('order.BillingInfo', on_delete=models.SET_NULL, null=True, blank=True, db_constraint=False)
+    refunded = models.BooleanField(default=False)
 
 class PricingPolicy(models.Model):
     ONESHOT = 'ONE'

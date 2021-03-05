@@ -13,7 +13,6 @@ def load_bootpay():
     return bootpay
 
 def billing_bootpay(bootpay, billing_id, product_name, price, order_id, userinfo):
-    print(bootpay, billing_id, product_name, price, order_id, userinfo)
     result = bootpay.subscribe_billing(
                         billing_id, product_name, 
                         price,      order_id, 
@@ -31,13 +30,14 @@ def save_billingInfo(billing_id, card_name, card_number):
 def find_free_serial(product):
     return ProductSerial.objects.filter(product=product, owner=None)
 
-def save_receipt(receipt_id, receipt_url, purchased_at, serial):
+def save_receipt(receipt_id, receipt_url, purchased_at, serial, billinginfo):
     purchased_at = purchased_at if purchased_at is not None else None
     serial = ProductSerial.objects.get(serial_number=serial.serial_number)
     return PaymentHistory.objects.create(receipt_id=receipt_id, 
                                          receipt_url=receipt_url, 
                                          date=purchased_at, 
-                                         serial=serial)
+                                         serial=serial,
+                                         billing_info = billinginfo)
 
 def send_receipt(url, email, serial_key):
     msg_html = render_to_string('order/receipt.html', 
@@ -70,8 +70,23 @@ def reserve(crontab_date, task, args, name):
         print(e)
         return None
 
-def reserve_billing(billing_id, policy, target_serial, userinfo, date):
+def reserve_billing(billing_id, policy, target_serial, userinfo, crontab_date):
     args = {'billing_id': billing_id, 'policy': policy, 
             'target_serial': target_serial, 'userinfo': userinfo}
 
-    return reserve(('*','*','*',datetime.today().day,'*'), 'order.tasks.do_payment', args, 'Billing_'+ billing_id)
+    return reserve(crontab_date, 'order.tasks.do_payment', args, 'Billing_'+ billing_id)
+
+def cancel_reserve(receipt_id):
+    try:
+        history = PaymentHistory.objects.get(receipt_id=receipt_id)
+        billing_key = history.billing_info.billing_key
+        PeriodicTask.objects.get(name='Billing_'+ billing_key).delete()
+        history.refunded = True
+        history.save()
+        BillingInfo.objects.get(billing_key=billing_key).delete()
+
+        return True
+
+    except Exception as e:
+        print(e)
+        return False

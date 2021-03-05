@@ -60,13 +60,14 @@
             order_id: order_id //고유 주문번호로, 생성하신 값을 보내주셔야 합니다.
         }).error(function (data) {
             //결제 진행시 에러가 발생하면 수행됩니다.
-            console.log(data);
+            alert(data.msg)
+            window.location.reload()
         }).cancel(function (data) {  
             //결제가 취소되면 수행됩니다.
-            console.log(data);
+            alert('Order canceled.')
+            window.location = 'https://services.hix.co.kr'
         }).done(function (data) {
             // 빌링키를 정상적으로 가져오면 해당 데이터를 불러옵니다.
-            console.log(data)
             formData.append('billing_id', data.billing_key);
             formData.append('order_id', order_id);
             fetch("", {
@@ -78,10 +79,8 @@
                 body: formData
             }).then(response => response.json())
             .then(data => {
-                console.log(data)
                 window.open(data['receipt_url'], '_blank', 'resizable=1, width=500, height=825')
-                window.location = 'https://services.hix.co.kr'
-
+                window.location = 'https://services.hix.co.kr/order/thank-you'
             });
         });
     </script>

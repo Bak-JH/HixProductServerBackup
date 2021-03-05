@@ -10,9 +10,7 @@ app = Celery('tasks', broker='pyamqp://guest:guest@localhost//')
 
 @shared_task()
 def do_payment(billing_id, policy, target_serial, userinfo):
-    print(BillingInfo.objects.all())
     bootpay = load_bootpay()
-    print(bootpay.response['status'])
     if bootpay.response['status'] is 200:
         result = billing_bootpay(
                     bootpay, 
@@ -24,9 +22,9 @@ def do_payment(billing_id, policy, target_serial, userinfo):
                 )
 
         if result is not None:
-            save_billingInfo(billing_id, result['card_name'], result['card_no'])
+            billinginfo = save_billingInfo(billing_id, result['card_name'], result['card_no'])
             save_receipt(result['receipt_id'], result['receipt_url'],
-                        result['purchased_at'], target_serial)
+                        result['purchased_at'], target_serial, billinginfo)
             send_receipt(result['receipt_url'], 
                         userinfo['email'], target_serial.serial_number)
             return result['receipt_url']
