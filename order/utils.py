@@ -1,10 +1,12 @@
+import datetime
+from time import timezone
 from lib.BootpayApi import BootpayApi
 from .models import BillingInfo, PaymentHistory
 from product.models import ProductSerial
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
-import datetime
+from datetime import timedelta
 
 
 def load_bootpay():
@@ -18,6 +20,7 @@ def billing_bootpay(bootpay, billing_id, product_name, price, order_id, userinfo
                         price,      order_id, 
                         [],         userinfo
                     )
+    print(result)
     return result['data'] if result['status'] is 200 else None
 
 def save_billingInfo(billing_id, card_name, card_number):
@@ -53,8 +56,7 @@ def send_receipt(url, email, serial_key):
 
     return result
 
-# crontab_date is tuple
-def reserve(crontab_date, task, args, name):
+def get_or_create_crontab(crontab_date):
     schedule, _ = CrontabSchedule.objects.get_or_create(
                                     minute=crontab_date[0],
                                     hour=crontab_date[1], 
@@ -62,8 +64,27 @@ def reserve(crontab_date, task, args, name):
                                     day_of_month=crontab_date[3], 
                                     month_of_year=crontab_date[4]
                                 )
+
+    return schedule
+
+def get_date_from_crontab(crontab_date):
+    timedelta(minutes=crontab_date[0],
+              hours=crontab_date[1], 
+              days=crontab_date[2], 
+              day_of_month=crontab_date[3], 
+              month_of_year=crontab_date[4])
+
+# crontab_date is tuple
+def reserve(crontab_date, task, args, name, expire_date):
+    schedule = get_or_create_crontab(crontab_date)
+
+
     try:
-        PeriodicTask.objects.create(crontab=schedule, name=name, task=task, args=args)
+        task, _ = PeriodicTask.objects.get_or_create(
+                        crontab=schedule, name=name, 
+                        task=task, args=args)
+        task.expires = expire_date
+        task.save()
         return schedule
 
     except Exception as e:
@@ -74,7 +95,10 @@ def reserve_billing(billing_id, policy, target_serial, userinfo, crontab_date):
     args = {'billing_id': billing_id, 'policy': policy, 
             'target_serial': target_serial, 'userinfo': userinfo}
 
-    return reserve(crontab_date, 'order.tasks.do_payment', args, 'Billing_'+ billing_id)
+    return reserve(crontab_date, 
+                    'order.tasks.do_payment', 
+                    args, 'Billing_'+ billing_id,
+                    datetime.datetime.now() + timedelta(days=33))
 
 def cancel_reserve(receipt_id):
     try:
@@ -85,8 +109,8 @@ def cancel_reserve(receipt_id):
         history.save()
         BillingInfo.objects.get(billing_key=billing_key).delete()
 
-        return True
+        return history.receipt_url
 
     except Exception as e:
         print(e)
-        return False
+        raise e

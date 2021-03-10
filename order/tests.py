@@ -8,6 +8,7 @@ from .models import *
 from .tasks import *
 from .utils import *
 from order.tasks import app
+from product.models import Product
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 
 
@@ -91,15 +92,15 @@ class PaymentTest(TestCase):
         self.assertIsNotNone(result)
 
     def test_5_receipt_save(self):
+        billinginfo = save_billingInfo(self.billing_id, 'KB국민카드', '5365100000002395')
         serial = find_free_serial(self.product)[0]
-        result = save_receipt(''.join(self.receipt_id), ''.join(self.receipt_url), timezone.now(), serial)
+        result = save_receipt(''.join(self.receipt_id), ''.join(self.receipt_url), datetime.datetime.now(), serial, billinginfo)
 
         print("==================== test_receipt_save ====================\n")
         print(serial.serial_number)
         print(result.receipt_id, result.receipt_url, result.date, '\n')
         print('--------------------------------------------------------------\n\n')
 
-        self.receipt_id.append(result.receipt_id)
         self.assertIsNotNone(result)
 
     def test_6_reserve(self):
@@ -122,7 +123,8 @@ class PaymentTest(TestCase):
         else:
             result = None
 
-        r = cancel_reserve(self.billing_id)
+        print(self.receipt_id[0])
+        r = cancel_reserve(self.receipt_id[0])
 
         print("==================== test_refund ====================\n")
         print(self.receipt_id)
@@ -144,4 +146,6 @@ class PaymentTest(TestCase):
 
         # Verify that the subject of the first message is correct.
         self.assertEqual(mail.outbox[0].subject, 'Receipt from HiX')
+
+    def 
 

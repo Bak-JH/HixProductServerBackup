@@ -49,10 +49,14 @@ def cancel_payment(request, receipt_id):
             result = bootpay.cancel(receipt_id, '', request.POST['cancel_user'], request.POST['cancel_reason'])
             
             if result['status'] is 200:
-                cancel_reserve(receipt_id)
+                try:
+                    receipt_url = cancel_reserve(receipt_id)
+                    return render(request, 'order/thank_you.html', 
+                                  {'refund': True, 'url': receipt_url})
+                except Exception as e:
+                    return show_error(request, 500, e)
             else:
                 return show_error(request, result['status'], result['message'])
-            return render(request, 'order/thank_you.html', {'refund': True})
         else:
             return show_error(request, bootpay.response['status'])
     else:
