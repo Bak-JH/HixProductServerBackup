@@ -16,7 +16,7 @@ def load_bootpay():
 
 def billing_bootpay(bootpay, billing_id, product_name, price, order_id, userinfo):
     result = bootpay.subscribe_billing(
-                        'billing_id', product_name, 
+                        billing_id, product_name, 
                         price,      order_id, 
                         [],         userinfo
                     )

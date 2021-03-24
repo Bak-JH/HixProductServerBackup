@@ -75,9 +75,14 @@ class PaymentTest(TestCase):
 
     def setUp(cls):
         ProductSerial.objects.create(product=cls.product, owner=None)
+        custom_serial = ProductSerial.objects.create(product=cls.product, owner=cls.user)
         target_serial = ProductSerial.objects.create(product=cls.product, owner=None)
         policy = PricingPolicy.objects.create(product=cls.product, price=1000)
-
+        billinginfo = BillingInfo.objects.create(billing_key='60176037238684001f8fb2f2', card_name='KB국민카드', card_number=2395)
+        PaymentHistory.objects.create(receipt_id='605996bf5b2948001f3d0116',
+                                        receipt_url='https://bit.ly/3rkP6We',
+                                        serial=custom_serial,
+                                        billing_info=billinginfo)
 
         userinfo = {'username': cls.user.username, 'email': cls.user.email}
         args = {'billing_id': cls.billing_id, 'policy': policy, 
@@ -211,7 +216,7 @@ class PaymentTest(TestCase):
         
         print('--------------------------------------------------------------\n\n')
 
-    def test_end_do_payment(self):
+    def test_A_do_payment(self):
         print("==================== test_do_payment ====================\n")
         policy = PricingPolicy.objects.get(product=self.product)
         serial = find_free_serial(self.product)[0]
@@ -219,3 +224,11 @@ class PaymentTest(TestCase):
         print(do_payment(self.billing_id, policy.product.name, policy.price, serial.serial_number, userinfo))
         print('--------------------------------------------------------------\n\n')
 
+    def test_B_do_payment_with_billinginfo(self):
+        print("==================== test_do_payment_with_billinginfo ====================\n")
+        serial = ProductSerial.objects.get(owner=self.user)
+        billinginfo = PaymentHistory.objects.filter(serial=serial)[0].billing_info
+        policy = PricingPolicy.objects.get(product=serial.product)
+        userinfo = {'username': self.user.username, 'email': self.user.email}
+        print(do_payment(billinginfo.billing_key, policy.product.name, policy.price, serial.serial_number, userinfo))
+        print('--------------------------------------------------------------\n\n')
