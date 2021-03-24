@@ -26,17 +26,12 @@ def subscribe(request):
         billing_id = request.POST['billing_id']        
         target_serial = find_free_serial(product)[0]
         userinfo = {'username': request.user.username, 'email': request.user.email}
-        result = do_payment(billing_id, policy, target_serial, userinfo)   
+        result = do_payment(billing_id, policy.product.name, policy.price, target_serial.serial_number, userinfo)   
         
 
         if result is not None:
-            crontab_date = ('*','*','*',str(datetime.datetime.today().day),'*')
-            reserve_result = reserve_billing(billing_id, policy, target_serial,
-                                                userinfo, crontab_date)
-            if reserve_result is not None:
-                return JsonResponse({'receipt_url': result})
-        return show_error(request, 500, )
-
+            return JsonResponse({'receipt_url': result})
+        return HttpResponse(status=500)
             
     else:
         return render(request, 'order/subscribe.html')

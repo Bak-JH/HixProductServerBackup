@@ -21,6 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django_email_verification import urls as mail_urls
 from django.contrib import admin
+from . import views
 
 admin.autodiscover()
 admin.site.enable_nav_sidebar = False
@@ -39,6 +40,7 @@ urlpatterns = [
     path('email/', include(mail_urls)),
     path('order/', include('order.urls')),
     path('taggit_autosuggest/', include('taggit_autosuggest.urls')),
+    path('error/<int:errcode>', views.show_error, name = 'show_error')
 ]
 
 

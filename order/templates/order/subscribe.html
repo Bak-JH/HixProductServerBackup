@@ -77,10 +77,18 @@
                 method: 'POST',
                 mode: 'same-origin',  // Do not send CSRF token to another domain.
                 body: formData
-            }).then(response => response.json())
+            }).then(response => {
+                if(response.ok){
+                    return response.json()
+                }
+                throw new Error()
+            })
             .then(data => {
                 window.open(data['receipt_url'], '_blank', 'resizable=1, width=500, height=825')
-                // window.location = 'https://services.hix.co.kr/order/thank-you'
+                window.location = 'https://services.hix.co.kr/order/thank-you'
+            })
+            .catch(() => {
+                window.location = "https://services.hix.co.kr/error/500"
             });
         });
     </script>

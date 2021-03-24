@@ -1,3 +1,5 @@
+from datetime import timedelta, tzinfo
+from logging import exception
 from django.test import TestCase
 import uuid
 from uuid import UUID
@@ -15,6 +17,49 @@ from django_celery_beat.models import CrontabSchedule, PeriodicTask
 def toJson(self, o):
     if isinstance(o, UUID): return str(o)
     return toJson(self, o)
+
+class BasicTest(TestCase):
+    @classmethod
+    def setUp(cls):
+        BillingInfo.objects.create(
+            billing_key='604f314c0d681b003ebfaf43', card_name='Test', card_number='1111')
+        schedule = CrontabSchedule.objects.create(
+                                minute='*',
+                                hour='*', 
+                                day_of_week='*', 
+                                day_of_month='*', 
+                                month_of_year='*'
+                            )
+        arg = {'billing_id': '604f314c0d681b003ebfaf43'}
+        PeriodicTask.objects.create(crontab=schedule, 
+                                    name='Billing_604f314c0d681b003ebfaf43' , 
+                                    task='order.tasks.do_payment',
+                                    args=arg, expires=datetime.datetime.now())
+
+    def test_create_or_get(self):
+        print("==================== test_create_or_get ====================\n")
+
+        print(BillingInfo.objects.all())
+        try:
+            result = BillingInfo.objects.get(billing_key='604f314c0d681b003ebfaf43')
+            result.card_number='1234'
+            result.save()
+        except BillingInfo.DoesNotExist:
+            result = BillingInfo.objects.create(billing_key='604f314c0d681b003ebfaf43',    
+                                                card_name='tttt', card_number='4567')
+        print(result)
+        test = BillingInfo.objects.get(billing_key='604f314c0d681b003ebfaf43')
+        print(test.card_number)
+        print('--------------------------------------------------------------\n\n')
+    
+    def test_compare_datetime(self):
+        print("==================== test_compare_datetime ====================\n")
+        test = PeriodicTask.objects.get(name='Billing_604f314c0d681b003ebfaf43')
+        print(test.expires)
+        print(type(test.expires))
+        print(type(datetime.datetime.now()))
+        print(test.expires < datetime.datetime.now(test.expires.tzinfo))
+        print('--------------------------------------------------------------\n\n')
 
 # Create your tests here.
 class PaymentTest(TestCase):
@@ -36,7 +81,7 @@ class PaymentTest(TestCase):
 
         userinfo = {'username': cls.user.username, 'email': cls.user.email}
         args = {'billing_id': cls.billing_id, 'policy': policy, 
-            'target_serial': target_serial, 'userinfo': userinfo}
+            'target_serial': target_serial.serial_number, 'userinfo': userinfo}
         schedule = CrontabSchedule.objects.create(
                                     minute='*',
                                     hour='*', 
@@ -48,6 +93,7 @@ class PaymentTest(TestCase):
                                     name='Billing_'+cls.billing_id, 
                                     task='order.tasks.do_payment',
                                     args=args)
+        reserve_pended_billing('60176037238684001f8fb2f2', policy.product.name, policy.price, target_serial.serial_number, userinfo)
 
     def test_1_bootpay_load(self):
         bootpay = load_bootpay()
@@ -94,7 +140,7 @@ class PaymentTest(TestCase):
     def test_5_receipt_save(self):
         billinginfo = save_billingInfo(self.billing_id, 'KB국민카드', '5365100000002395')
         serial = find_free_serial(self.product)[0]
-        result = save_receipt(''.join(self.receipt_id), ''.join(self.receipt_url), datetime.datetime.now(), serial, billinginfo)
+        result = save_receipt(''.join(self.receipt_id), ''.join(self.receipt_url), datetime.datetime.now(), serial.serial_number, billinginfo)
 
         print("==================== test_receipt_save ====================\n")
         print(serial.serial_number)
@@ -109,9 +155,10 @@ class PaymentTest(TestCase):
         userinfo = {'username': self.user.username, 'email': self.user.email}
         crontab_date = ('*','*','*',datetime.datetime.today().day,'*')
 
-        result = reserve_billing(self.billing_id+'=', policy, serial, userinfo, crontab_date)
+        result = reserve_billing(self.billing_id+'=', policy.product.name, policy.price, serial.serial_number, userinfo, crontab_date)
         print("==================== test_reserve ====================\n")
         print(result, '\n')
+        print(PeriodicTask.objects.all())
         print('--------------------------------------------------------------\n\n')
 
         self.assertIsNotNone(result)
@@ -146,6 +193,29 @@ class PaymentTest(TestCase):
 
         # Verify that the subject of the first message is correct.
         self.assertEqual(mail.outbox[0].subject, 'Receipt from HiX')
+    
+    def test_9_billing_failed(self):
+        print("==================== test_billing_failed ====================\n")
 
-    def 
+        bootpay = load_bootpay()
+        result = billing_bootpay(bootpay, 'it must be failed', 
+                                self.product.name, self.price, 
+                                self.order_id,
+                                {'username': self.user.username, 'email': self.user.email})
+        if result is None:
+            policy = PricingPolicy.objects.get(product=self.product)
+            serial = find_free_serial(self.product)[0]
+            userinfo = {'username': self.user.username, 'email': self.user.email}
+            print(reserve_pended_billing(self.billing_id, policy.product.name, policy.price, serial, userinfo))
+            print(PeriodicTask.objects.all())
+        
+        print('--------------------------------------------------------------\n\n')
+
+    def test_end_do_payment(self):
+        print("==================== test_do_payment ====================\n")
+        policy = PricingPolicy.objects.get(product=self.product)
+        serial = find_free_serial(self.product)[0]
+        userinfo = {'username': self.user.username, 'email': self.user.email}
+        print(do_payment(self.billing_id, policy.product.name, policy.price, serial.serial_number, userinfo))
+        print('--------------------------------------------------------------\n\n')
 
