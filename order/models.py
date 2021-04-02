@@ -2,12 +2,14 @@ from product.models import ProductSerial
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+import uuid
 
 # Create your models here.
 class BillingInfo(models.Model):
     billing_key = models.CharField(primary_key=True, unique=True, max_length=50)
     card_name = models.CharField(max_length=50, default="")
     card_number = models.PositiveSmallIntegerField(default=0)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True, blank=True)
 
 class PaymentHistory(models.Model):
     receipt_id = models.CharField(primary_key=True, unique=True, max_length=100)
@@ -24,6 +26,7 @@ class PricingPolicy(models.Model):
         (ONESHOT, 'OneShot'),
         (PERIOD, 'Period')
     ]
+    pricing_id = models.UUIDField(default=uuid.uuid4)
     method = models.CharField(max_length=10, choices=PurchaseMethod, default=ONESHOT)
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE)
     price = models.FloatField()

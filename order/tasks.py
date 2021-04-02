@@ -21,7 +21,7 @@ def do_payment(billing_id, product_name, price, serial_number, userinfo):
                 )
 
         if result is not None:
-            billinginfo = save_billingInfo(billing_id, result['card_name'], result['card_no'])
+            billinginfo = save_billingInfo(billing_id, result['card_name'], result['card_no'], userinfo['username'])
             save_receipt(result['receipt_id'], result['receipt_url'],
                         result['purchased_at'], serial_number, billinginfo)
             send_receipt(result['receipt_url'],

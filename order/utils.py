@@ -5,6 +5,7 @@ from .models import BillingInfo, PaymentHistory
 from product.models import ProductSerial
 from django.template.loader import render_to_string
 from django.core.mail import send_mail
+from django.contrib.auth.models import User
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
 import json
 
@@ -22,15 +23,17 @@ def billing_bootpay(bootpay, billing_id, product_name, price, order_id, userinfo
                     )
     return result['data'] if result['status'] is 200 else None
 
-def save_billingInfo(billing_id, card_name, card_number):
+def save_billingInfo(billing_id, card_name, card_number, username):
     card_number = card_number[-4:]
+    user = User.objects.get(username=username)
     result, _ = BillingInfo.objects.get_or_create(billing_key=billing_id, 
                                                 card_name=card_name, 
-                                                card_number=card_number)
+                                                card_number=card_number,
+                                                owner=user)
     return result
 
-def find_free_serial(product):
-    return ProductSerial.objects.filter(product=product, owner=None)
+def create_new_serial(product):
+    return ProductSerial.objects.create(product=product, owner=None)
 
 def save_receipt(receipt_id, receipt_url, purchased_at, serial_number, billinginfo):
     purchased_at = purchased_at if purchased_at is not None else None

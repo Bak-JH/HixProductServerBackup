@@ -1,0 +1,56 @@
+{% extends 'product/base.html' %}
+
+{% block title %}
+  HiX Local Library
+{% endblock %}
+
+{% block content %}
+    <script>
+        function toggleChangeUsername() {
+            var input = document.getElementById("username");
+            if (input.disabled == true) {
+                input.disabled = false;
+            } else {
+                input.disabled = true;
+            }
+        }
+    </script>
+
+    <div class="row mt-3 align-items-center">
+        <div class="col-md-6">
+            <input id="username" class="form-control form-control-lg" type="text" value={{user.username}} disabled />
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-default btn-block" onclick="toggleChangeUsername()">
+                Change Username
+            </button>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-default btn-block" onclick="window.location='https://services.hix.co.kr/accounts/password/reset/'">
+                Change Password
+            </button>
+        </div>
+    </div>
+
+    <div class="row mt-3 align-items-center">
+        <div class="col-md-12">
+            <button class="btn btn-success btn-block">
+                Submit
+            </button>
+        </div>
+    </div>
+
+    <div class="row mt-5 align-items-center">
+    {% for serial_key in serial_keys %}
+        <div class="col-md-9 mt-3">
+            <h3 class="text-center vcenter"> {{ serial_key }} </h3>
+        </div>
+        <div class="col-md-3 mt-3">
+            <button class="btn btn-default btn-block"
+                    onclick="window.location='https://services.hix.co.kr/product/transmit_serial/{{serial_key}}'">
+                Transmit Serial
+            </button>
+        </div>
+    {% endfor %}
+    </div>
+{% endblock %}

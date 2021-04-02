@@ -13,10 +13,10 @@ from slicerServer.views import show_error
 @login_required(login_url="/product/login")
 def subscribe(request):
     try:
-        product = Product.objects.get(name=request.GET.get('product'))
-        policy = PricingPolicy.objects.get(product=product)
+        policy = PricingPolicy.objects.get(pricing_id=request.GET.get('pricingid'))
+        product = policy.product
     except:
-        return show_error(request, 404, 'Product Not Exist')
+        return show_error(request, 404, 'Pricing Policy Not Exist')
 
     bootpay = load_bootpay()
     if bootpay.response['status'] is not 200:
@@ -24,17 +24,19 @@ def subscribe(request):
 
     if request.method == 'POST':
         billing_id = request.POST['billing_id']        
-        target_serial = find_free_serial(product)[0]
+        target_serial = create_new_serial(product)
         userinfo = {'username': request.user.username, 'email': request.user.email}
-        result = do_payment(billing_id, policy.product.name, policy.price, target_serial.serial_number, userinfo)   
+        result = do_payment(billing_id, product.name, policy.price, target_serial.serial_number, userinfo)   
         
 
         if result is not None:
+            target_serial.is_activated = True
+            target_serial.save()
             return JsonResponse({'receipt_url': result})
         return HttpResponse(status=500)
             
     else:
-        return render(request, 'order/subscribe.html')
+        return render(request, 'order/subscribe.html', {'product':product.name})
 
 @login_required(login_url="/product/login")
 def cancel_payment(request, receipt_id):

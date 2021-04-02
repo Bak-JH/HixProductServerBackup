@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from taggit_autosuggest.managers import TaggableManager
+from django.urls import reverse
 
 import uuid
 
@@ -37,5 +38,10 @@ class ProductSerial(models.Model):
     expire_date = models.DateField(null=True, blank=True, help_text='Expiry date, if blank means does not expire.')
     created_date = models.DateTimeField(auto_now_add=True)
     batch = models.ForeignKey(ProductSerial_batch, on_delete=models.SET_NULL, null=True, blank=True)
+    reset_count = models.PositiveSmallIntegerField(default=3)
+
+    def get_absolut_url(self):
+        return reverse('product:profile:serial_keys',
+                       args=[self.serial_number])
 
     #TODO: constraint to make sure {owner, product} is unique when owner is NOT NULL

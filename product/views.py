@@ -1,4 +1,5 @@
 import datetime
+from slicerServer.views import show_error
 import urllib
 import json
 
@@ -235,3 +236,33 @@ def link_to_local_user(sender, request, sociallogin, **kwargs):
     except User.DoesNotExist:
         pass
     
+def view_profile(request):
+    query = ProductSerial.objects.filter(owner=request.user)
+    serial_keys = []
+    for serial in query:
+        serial_keys.append(serial.serial_number)
+
+    return render(request, 'product/profile.html', {'serial_keys': serial_keys})
+
+def get_serial_list(request, serial_key):
+    return render(request, 'product/profile.html', {'serial_key': serial_key})
+
+@login_required(login_url="/product/login")
+def transmit_serial(request, serial_key):
+    serial = ProductSerial.objects.get(serial_number=serial_key)
+    if serial.owner == request.user:
+        if request.method == "POST":
+            result = request.POST['clicked']
+            if result == 'true':
+                if serial.reset_count > 0:
+                    serial.owner = None
+                    serial.reset_count -= 1
+                    serial.save()
+                    return HttpResponse('ok')
+                else:
+                    return HttpResponse(status=500, reason="No reset count remains.")
+        return render(request, 'product/transmit_serial.html',
+                        { 'serial_key': serial_key, 'product': serial.product,
+                          'reset_count': serial.reset_count })
+    else:
+        return show_error(request, 500)

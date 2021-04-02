@@ -124,10 +124,10 @@ class PaymentTest(TestCase):
 
         self.assertIsNotNone(result)
 
-    def test_3_find_free_serial(self):
-        result = find_free_serial(self.product)
+    def test_3_create_new_serial(self):
+        result = create_new_serial(self.product)
 
-        print("==================== test_find_free_serial ====================\n")
+        print("==================== test_create_new_serial ====================\n")
         print(result, '\n')
         print('--------------------------------------------------------------\n\n')
 
@@ -144,7 +144,7 @@ class PaymentTest(TestCase):
 
     def test_5_receipt_save(self):
         billinginfo = save_billingInfo(self.billing_id, 'KB국민카드', '5365100000002395')
-        serial = find_free_serial(self.product)[0]
+        serial = create_new_serial(self.product)
         result = save_receipt(''.join(self.receipt_id), ''.join(self.receipt_url), datetime.datetime.now(), serial.serial_number, billinginfo)
 
         print("==================== test_receipt_save ====================\n")
@@ -156,7 +156,7 @@ class PaymentTest(TestCase):
 
     def test_6_reserve(self):
         policy = PricingPolicy.objects.get(product=self.product)
-        serial = find_free_serial(self.product)[0]
+        serial = create_new_serial(self.product)
         userinfo = {'username': self.user.username, 'email': self.user.email}
         crontab_date = ('*','*','*',datetime.datetime.today().day,'*')
 
@@ -189,7 +189,7 @@ class PaymentTest(TestCase):
 
     def test_8_sendmail(self):
         print("==================== test_sendmail ====================\n")
-        print(send_receipt('https://bit.ly/3jM6Rf2', 'bakjh.6280@gmail.com', find_free_serial(self.product)[0]))
+        print(send_receipt('https://bit.ly/3jM6Rf2', 'bakjh.6280@gmail.com', create_new_serial(self.product)[0]))
         print('--------------------------------------------------------------\n\n')
         
         self.assertEqual(len(mail.outbox), 1)
@@ -209,7 +209,7 @@ class PaymentTest(TestCase):
                                 {'username': self.user.username, 'email': self.user.email})
         if result is None:
             policy = PricingPolicy.objects.get(product=self.product)
-            serial = find_free_serial(self.product)[0]
+            serial = create_new_serial(self.product)[0]
             userinfo = {'username': self.user.username, 'email': self.user.email}
             print(reserve_pended_billing(self.billing_id, policy.product.name, policy.price, serial, userinfo))
             print(PeriodicTask.objects.all())
@@ -219,7 +219,7 @@ class PaymentTest(TestCase):
     def test_A_do_payment(self):
         print("==================== test_do_payment ====================\n")
         policy = PricingPolicy.objects.get(product=self.product)
-        serial = find_free_serial(self.product)[0]
+        serial = create_new_serial(self.product)
         userinfo = {'username': self.user.username, 'email': self.user.email}
         print(do_payment(self.billing_id, policy.product.name, policy.price, serial.serial_number, userinfo))
         print('--------------------------------------------------------------\n\n')
@@ -227,7 +227,7 @@ class PaymentTest(TestCase):
     def test_B_do_payment_with_billinginfo(self):
         print("==================== test_do_payment_with_billinginfo ====================\n")
         serial = ProductSerial.objects.get(owner=self.user)
-        billinginfo = PaymentHistory.objects.filter(serial=serial)[0].billing_info
+        billinginfo = PaymentHistory.objects.filter(serial=serial).billing_info
         policy = PricingPolicy.objects.get(product=serial.product)
         userinfo = {'username': self.user.username, 'email': self.user.email}
         print(do_payment(billinginfo.billing_key, policy.product.name, policy.price, serial.serial_number, userinfo))

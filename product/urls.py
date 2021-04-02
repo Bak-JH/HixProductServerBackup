@@ -31,4 +31,7 @@ urlpatterns = [
     path('owns/<str:product_name>', views.owns, name = 'owns_product'),
     path('register/', views.register, name = 'register_product'),
     path('registration_done/', views.registration_done, name = 'registration_done'),
+    path('profile/', views.view_profile, name='view_profile'),
+    path('profile/serial_keys/', views.get_serial_list, name='get_serial_list'),
+    path('transmit_serial/<str:serial_key>', views.transmit_serial, name='transmit_serial'),
 ]
