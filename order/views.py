@@ -8,12 +8,13 @@ from product.models import Product
 from .utils import *
 import datetime
 from slicerServer.views import show_error
+from rest_framework.decorators import api_view
 
 # from django.views.decorators.csrf import csrf_exempt
 @login_required(login_url="/product/login")
 def subscribe(request):
     try:
-        policy = PricingPolicy.objects.get(pricing_id=request.GET.get('pricingid'))
+        policy = PricingPolicy.objects.get(pricing_id=request.GET.get('id'))
         product = policy.product
     except:
         return show_error(request, 404, 'Pricing Policy Not Exist')
@@ -23,15 +24,17 @@ def subscribe(request):
         return show_error(request, bootpay.response['status'])
 
     if request.method == 'POST':
-        billing_id = request.POST['billing_id']        
+        try:
+            billing_id = request.POST['billing_id'] 
+        except:
+            billing_id = request.data['billing_id']
+            
         target_serial = create_new_serial(product)
         userinfo = {'username': request.user.username, 'email': request.user.email}
-        result = do_payment(billing_id, product.name, policy.price, target_serial.serial_number, userinfo)   
+        result = do_payment(billing_id, product.name, policy.price, target_serial.serial_number, userinfo)
         
 
         if result is not None:
-            target_serial.is_activated = True
-            target_serial.save()
             return JsonResponse({'receipt_url': result})
         return HttpResponse(status=500)
             

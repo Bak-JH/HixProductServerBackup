@@ -20,6 +20,7 @@ import uuid
 
 class Product(models.Model):
     name = models.CharField(max_length=200, unique=True, primary_key=True, help_text="Name of the product")
+    description = models.JSONField(default=dict)
     def __str__(self):
         return u'%s' % (self.name)
 

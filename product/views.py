@@ -1,26 +1,20 @@
-import datetime
+from .serializers import *
+from order.models import BillingInfo, PricingPolicy
 from slicerServer.views import show_error
-import urllib
-import json
 
 from django.shortcuts import render
-from django.views import generic
 from django.views.decorators.http import require_GET
-from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
-from django.core.exceptions import MultipleObjectsReturned 
+from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from .models import Product, ProductSerial
 from .forms import *
-from django.db import models
 from django.conf import settings
+from rest_framework.response import Response
 
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.models import SocialAccount
@@ -35,6 +29,7 @@ from rest_framework.decorators import api_view
 
 from django_email_verification import sendConfirm
 from .utils import verify_recaptcha
+from .serializers import *
 
 # @require_GET
 # # @login_required
@@ -266,3 +261,36 @@ def transmit_serial(request, serial_key):
                           'reset_count': serial.reset_count })
     else:
         return show_error(request, 500)
+
+@api_view(['GET'])
+def get_plans(request): 
+    try:
+        if request.GET.get('filter') is not None:
+            query = PricingPolicy.objects.filter(method=request.GET.get('filter'))
+        else:
+            query = PricingPolicy.objects.all()
+        result = PolicySerializer(query, many=True)
+        print(result.data)
+        return Response(result.data)
+    except Exception as e:
+        print(e)
+        return Response()
+
+@api_view(['GET'])
+def get_plan(request, plan_id):
+    try:
+        query = PricingPolicy.objects.get(pricing_id=plan_id)
+        result = PolicySerializer(query)
+        return Response(result.data)
+    except:
+        return Response(status=500, reason="Plan is not exist")
+
+@api_view(['GET'])
+def get_cards(request):
+    try:
+        query = BillingInfo.objects.filter(owner=request.user)
+        result = BillingInfoSerializer(query, many=True)
+        return Response(result.data)
+    except Exception as e:
+        print(e)
+        return Response()

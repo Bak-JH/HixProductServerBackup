@@ -8,7 +8,7 @@ import uuid
 class BillingInfo(models.Model):
     billing_key = models.CharField(primary_key=True, unique=True, max_length=50)
     card_name = models.CharField(max_length=50, default="")
-    card_number = models.PositiveSmallIntegerField(default=0)
+    card_number = models.CharField(max_length=20, default="")
     owner = models.ForeignKey(User, on_delete=models.CASCADE, default=None, null=True, blank=True)
 
 class PaymentHistory(models.Model):
@@ -20,13 +20,15 @@ class PaymentHistory(models.Model):
     refunded = models.BooleanField(default=False)
 
 class PricingPolicy(models.Model):
-    ONESHOT = 'ONE'
-    PERIOD = 'PER'
+    ONEOFF = 'One-Off'
+    MONTHLY = 'Monthly'
+    YEARLY = 'Yearly'
     PurchaseMethod = [
-        (ONESHOT, 'OneShot'),
-        (PERIOD, 'Period')
+        (ONEOFF, 'One-Off'),
+        (MONTHLY, 'Monthly'),
+        (YEARLY, 'Yearly')
     ]
     pricing_id = models.UUIDField(default=uuid.uuid4)
-    method = models.CharField(max_length=10, choices=PurchaseMethod, default=ONESHOT)
+    method = models.CharField(max_length=10, choices=PurchaseMethod, default=ONEOFF)
     product = models.ForeignKey('product.Product', on_delete=models.CASCADE)
     price = models.FloatField()

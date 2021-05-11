@@ -34,4 +34,9 @@ urlpatterns = [
     path('profile/', views.view_profile, name='view_profile'),
     path('profile/serial_keys/', views.get_serial_list, name='get_serial_list'),
     path('transmit_serial/<str:serial_key>', views.transmit_serial, name='transmit_serial'),
+    
+    #this is for react
+    path('get_plans/', views.get_plans, name="get_plans"),
+    path('get_plan/<str:plan_id>', views.get_plan, name="get_plan"),
+    path('get_cards/', views.get_cards, name="get_cards"),
 ]

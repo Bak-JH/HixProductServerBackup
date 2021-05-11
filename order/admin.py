@@ -3,13 +3,15 @@ from .models import BillingInfo, PricingPolicy, PaymentHistory
 
 # Register your models here.
 @admin.register(BillingInfo)
-class Test(admin.ModelAdmin):
+class BillingInfoInstanceAdmin(admin.ModelAdmin):
     list_display = ('billing_key', 'card_name', 'card_number')
 
 @admin.register(PricingPolicy)
-class Test(admin.ModelAdmin):
-    pass
+class PricingPolicyInstanceAdmin(admin.ModelAdmin):
+    list_display = ('pricing_id', 'method', 'product', 'price')
+    list_filter = ('method', 'product')
 
 @admin.register(PaymentHistory)
-class Test(admin.ModelAdmin):
-    pass
+class TesPaymentHistoryInstanceAdmin(admin.ModelAdmin):
+    list_display = ('receipt_id', 'date', 'serial', 'billing_info', 'refunded')
+    list_filter = ('date', 'serial', 'billing_info', 'refunded')

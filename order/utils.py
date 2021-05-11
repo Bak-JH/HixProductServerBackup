@@ -24,7 +24,12 @@ def billing_bootpay(bootpay, billing_id, product_name, price, order_id, userinfo
     return result['data'] if result['status'] is 200 else None
 
 def save_billingInfo(billing_id, card_name, card_number, username):
-    card_number = card_number[-4:]
+    # if len(card_number) == 16:
+    #     do something
+    part_1 = card_number[:6]
+    part_2 = card_number[12:]
+    
+    card_number = part_1 + "******" + part_2
     user = User.objects.get(username=username)
     result, _ = BillingInfo.objects.get_or_create(billing_key=billing_id, 
                                                 card_name=card_name, 
