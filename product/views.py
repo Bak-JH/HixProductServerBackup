@@ -1,3 +1,4 @@
+from django.core import exceptions
 from .serializers import *
 from order.models import BillingInfo, PricingPolicy
 from slicerServer.views import show_error
@@ -231,6 +232,7 @@ def link_to_local_user(sender, request, sociallogin, **kwargs):
     except User.DoesNotExist:
         pass
     
+@login_required(login_url="/product/login")
 def view_profile(request):
     query = ProductSerial.objects.filter(owner=request.user)
     serial_keys = []
@@ -239,6 +241,28 @@ def view_profile(request):
 
     return render(request, 'product/profile.html', {'serial_keys': serial_keys})
 
+@login_required(login_url="/product/login")
+def edit_username(request):
+    error = ""
+    if request.method == 'POST':
+        new_name = request.POST['username']
+        try:
+            user = User.objects.get(username=new_name)
+            error = "Username already exists."
+        except User.DoesNotExist: 
+            old_user = User.objects.get(username=request.user)
+            old_user.username = new_name
+            old_user.save()
+
+            return render(request, 'product/edit_username.html',
+                            {'done': True, 'new_name': new_name})
+        except Exception as e:
+            error = e
+
+    form = ChangeUsernameForm(initial={'username': request.user})
+    return render(request, 'product/edit_username.html',{'error': error, 'form': form})
+
+@login_required(login_url="/product/login")
 def get_serial_list(request, serial_key):
     return render(request, 'product/profile.html', {'serial_key': serial_key})
 
