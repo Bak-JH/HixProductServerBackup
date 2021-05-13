@@ -194,11 +194,11 @@ def product_logout(request):
         next_url = request.GET.get('next')
         if next_url:
             response = HttpResponseRedirect(next_url)
-            response.delete_cookie('username')
+            response.delete_cookie('username', domain='.hix.co.kr')
             return response   
         else:
             response = HttpResponseRedirect('/product/login/')
-            response.delete_cookie('username')
+            response.delete_cookie('username', domain='.hix.co.kr')
             return response
     else:
         return render(request, 'product/logout.html')
