@@ -10,7 +10,10 @@ import datetime
 from slicerServer.views import show_error
 from rest_framework.decorators import api_view
 
+from django.contrib.admin.views.decorators import staff_member_required
+
 # from django.views.decorators.csrf import csrf_exempt
+@staff_member_required
 @login_required(login_url="/product/login")
 def subscribe(request):
     try:
@@ -41,6 +44,7 @@ def subscribe(request):
     else:
         return render(request, 'order/subscribe.html', {'product':product.name})
 
+@staff_member_required
 @login_required(login_url="/product/login")
 def cancel_payment(request, receipt_id):
     if request.method == "POST":

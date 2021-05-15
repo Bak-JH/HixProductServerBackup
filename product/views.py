@@ -27,6 +27,7 @@ from allauth.account.utils import perform_login
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from django.contrib.admin.views.decorators import staff_member_required
 
 from django_email_verification import sendConfirm
 from .utils import verify_recaptcha
@@ -231,7 +232,8 @@ def link_to_local_user(sender, request, sociallogin, **kwargs):
         raise ImmediateHttpResponse(perform_login(request, user, email_verification='optional'))
     except User.DoesNotExist:
         pass
-    
+
+@staff_member_required    
 @login_required(login_url="/product/login")
 def view_profile(request):
     query = ProductSerial.objects.filter(owner=request.user)
@@ -241,6 +243,7 @@ def view_profile(request):
 
     return render(request, 'product/profile.html', {'serial_keys': serial_keys})
 
+@staff_member_required
 @login_required(login_url="/product/login")
 def edit_username(request):
     error = ""
@@ -262,10 +265,12 @@ def edit_username(request):
     form = ChangeUsernameForm(initial={'username': request.user})
     return render(request, 'product/edit_username.html',{'error': error, 'form': form})
 
+@staff_member_required
 @login_required(login_url="/product/login")
 def get_serial_list(request, serial_key):
     return render(request, 'product/profile.html', {'serial_key': serial_key})
 
+@staff_member_required
 @login_required(login_url="/product/login")
 def transmit_serial(request, serial_key):
     serial = ProductSerial.objects.get(serial_number=serial_key)
@@ -287,6 +292,7 @@ def transmit_serial(request, serial_key):
         return show_error(request, 500)
 
 @api_view(['GET'])
+@staff_member_required
 def get_plans(request): 
     try:
         if request.GET.get('filter') is not None:
@@ -301,6 +307,7 @@ def get_plans(request):
         return Response()
 
 @api_view(['GET'])
+@staff_member_required
 def get_plan(request, plan_id):
     try:
         query = PricingPolicy.objects.get(pricing_id=plan_id)
@@ -310,6 +317,7 @@ def get_plan(request, plan_id):
         return Response(status=500, reason="Plan is not exist")
 
 @api_view(['GET'])
+@staff_member_required
 def get_cards(request):
     try:
         query = BillingInfo.objects.filter(owner=request.user)
