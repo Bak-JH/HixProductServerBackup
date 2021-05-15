@@ -9,11 +9,14 @@ from .utils import *
 import datetime
 from slicerServer.views import show_error
 
+from django.contrib.admin.views.decorators import staff_member_required
+
 # from django.views.decorators.csrf import csrf_exempt
+@staff_member_required
 @login_required(login_url="/product/login")
 def subscribe(request):
     try:
-        policy = PricingPolicy.objects.get(pricing_id=request.GET.get('pricingid'))
+        policy = PricingPolicy.objects.get(pricing_id=request.GET.get('id'))
         product = policy.product
     except:
         return show_error(request, 404, 'Pricing Policy Not Exist')
@@ -38,6 +41,7 @@ def subscribe(request):
     else:
         return render(request, 'order/subscribe.html', {'product':product.name})
 
+@staff_member_required
 @login_required(login_url="/product/login")
 def cancel_payment(request, receipt_id):
     if request.method == "POST":

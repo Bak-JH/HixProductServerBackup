@@ -29,6 +29,8 @@ from allauth.exceptions import ImmediateHttpResponse
 from django.dispatch import receiver
 from allauth.account.utils import perform_login
 
+from django.contrib.admin.views.decorators import staff_member_required
+
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -235,7 +237,8 @@ def link_to_local_user(sender, request, sociallogin, **kwargs):
         raise ImmediateHttpResponse(perform_login(request, user, email_verification='optional'))
     except User.DoesNotExist:
         pass
-    
+
+@staff_member_required
 def view_profile(request):
     query = ProductSerial.objects.filter(owner=request.user)
     serial_keys = []
@@ -244,9 +247,11 @@ def view_profile(request):
 
     return render(request, 'product/profile.html', {'serial_keys': serial_keys})
 
+@staff_member_required
 def get_serial_list(request, serial_key):
     return render(request, 'product/profile.html', {'serial_key': serial_key})
 
+@staff_member_required
 @login_required(login_url="/product/login")
 def transmit_serial(request, serial_key):
     serial = ProductSerial.objects.get(serial_number=serial_key)
