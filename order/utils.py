@@ -23,7 +23,7 @@ def billing_bootpay(bootpay, billing_id, product_name, price, order_id, userinfo
                     )
     return result['data'] if result['status'] is 200 else None
 
-def save_billingInfo(billing_id, card_name, card_number, username):
+def save_billingInfo(isSave, billing_id, card_name, card_number, username):
     # if len(card_number) == 16:
     #     do something
     part_1 = card_number[:6]
@@ -35,6 +35,10 @@ def save_billingInfo(billing_id, card_name, card_number, username):
                                                 card_name=card_name, 
                                                 card_number=card_number,
                                                 owner=user)
+    if isSave != "true":
+        to_delete = BillingInfo.objects.get(billing_key=result.billing_key)
+        to_delete.delete()
+
     return result
 
 def create_new_serial(product):

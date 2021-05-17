@@ -46,7 +46,6 @@
             return sval;
         }
 
-
         var csrftoken = getCookie('csrftoken');
         var formData = new FormData();
         var order_id = getUUID()
@@ -68,8 +67,12 @@
             window.location = 'https://services.hix.co.kr'
         }).done(function (data) {
             // 빌링키를 정상적으로 가져오면 해당 데이터를 불러옵니다.
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+
             formData.append('billing_id', data.billing_key);
             formData.append('order_id', order_id);
+            formData.append('is_save', urlParams.get('save'))
             fetch("", {
                 headers: {
                     'X-CSRFToken': csrftoken
