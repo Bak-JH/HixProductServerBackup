@@ -98,7 +98,6 @@ class PaymentTest(TestCase):
                                     name='Billing_'+cls.billing_id, 
                                     task='order.tasks.do_payment',
                                     args=args)
-        reserve_pended_billing('60176037238684001f8fb2f2', policy.product.name, policy.price, target_serial.serial_number, userinfo)
 
     def test_1_bootpay_load(self):
         bootpay = load_bootpay()
@@ -134,7 +133,7 @@ class PaymentTest(TestCase):
         self.assertIsNotNone(result)
 
     def test_4_billinginfo_save(self):
-        result = save_billingInfo(self.billing_id, 'KB국민카드', '5365100000002395')
+        result = save_billingInfo(True, self.billinginfo, 'KB국민카드', '5365100000002395', self.user)
 
         print("==================== test_billinginfo_save ====================\n")
         print(result.billing_key, result.card_number, result.card_name, '\n')
@@ -154,19 +153,19 @@ class PaymentTest(TestCase):
 
         self.assertIsNotNone(result)
 
-    def test_6_reserve(self):
-        policy = PricingPolicy.objects.get(product=self.product)
-        serial = create_new_serial(self.product)
-        userinfo = {'username': self.user.username, 'email': self.user.email}
-        crontab_date = ('*','*','*',datetime.datetime.today().day,'*')
+    # def test_6_reserve(self):
+    #     policy = PricingPolicy.objects.get(product=self.product)
+    #     serial = create_new_serial(self.product)
+    #     userinfo = {'username': self.user.username, 'email': self.user.email}
+    #     crontab_date = ('*','*','*',datetime.datetime.today().day,'*')
 
-        result = reserve_billing(self.billing_id+'=', policy.product.name, policy.price, serial.serial_number, userinfo, crontab_date)
-        print("==================== test_reserve ====================\n")
-        print(result, '\n')
-        print(PeriodicTask.objects.all())
-        print('--------------------------------------------------------------\n\n')
+    #     result = reserve_billing(self.billing_id+'=', policy.product.name, policy.price, serial.serial_number, userinfo, crontab_date)
+    #     print("==================== test_reserve ====================\n")
+    #     print(result, '\n')
+    #     print(PeriodicTask.objects.all())
+    #     print('--------------------------------------------------------------\n\n')
 
-        self.assertIsNotNone(result)
+    #     self.assertIsNotNone(result)
 
     def test_7_refund(self):
         bootpay = load_bootpay()
@@ -232,3 +231,15 @@ class PaymentTest(TestCase):
         userinfo = {'username': self.user.username, 'email': self.user.email}
         print(do_payment(billinginfo.billing_key, policy.product.name, policy.price, serial.serial_number, userinfo))
         print('--------------------------------------------------------------\n\n')
+    
+    def test_C_Regular_save(self):
+        print("==================== test_regular_save ====================\n")
+        serial = ProductSerial.objects.get(owner=self.user)
+        billinginfo = BillingInfo.objects.get(billing_key=self.billing_id)
+        policy = PricingPolicy.objects.get(product=serial.product)
+
+        regular = RegularPayment.objects.create(serial=serial, billing_info=billinginfo, policy=policy)
+
+        print(regular)
+        print('--------------------------------------------------------------\n\n')
+

@@ -3,14 +3,41 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, Http404, HttpResponseNotFound
 from .forms import CancelForm
 from django.contrib.auth.decorators import login_required
-from .models import  PricingPolicy
+from .models import  PricingPolicy, RegularPayment
 from product.models import Product
 from .utils import *
 import datetime
+import uuid
 from slicerServer.views import show_error
 from rest_framework.decorators import api_view
 
 from django.contrib.admin.views.decorators import staff_member_required
+
+def do_payment_first(billing_id, policy, serial, user):
+    bootpay = load_bootpay()
+    if bootpay.response['status'] is 200:
+        result = billing_bootpay(
+                    bootpay, 
+                    billing_id, 
+                    policy.product.name, 
+                    policy.price,
+                    str(uuid.uuid4()),
+                    {'username': user.username, 'email': user.email}
+                )
+
+        if result is not None:
+            billinginfo = save_billingInfo(True, billing_id, result['card_name'], result['card_no'], user)# disabled isSave
+            save_receipt(result['receipt_id'], result['receipt_url'], result['purchased_at'], serial.serial_number, billinginfo)
+            send_receipt(result['receipt_url'],
+                        user.email, serial.serial_number)
+            
+            crontab_date = ('*','*','*',str(datetime.datetime.today().day),'*')
+
+            regular = RegularPayment.objects.create(serial=serial, billing_info=billinginfo, policy=policy)
+
+            reserve_billing(crontab_date, str(regular.id))
+            return result['receipt_url']
+    return None
 
 # from django.views.decorators.csrf import csrf_exempt
 @staff_member_required
@@ -30,15 +57,22 @@ def subscribe(request):
         try:
             billing_id = request.POST['billing_id'] 
         except:
-            billing_id = request.data['billing_id']
+            try: 
+                billing_id = request.data['billing_id']
+            except:
+                return HttpResponse(status=500)
             
         target_serial = create_new_serial(product)
-        userinfo = {'username': request.user.username, 'email': request.user.email}
+        try:
+            user = User.objects.get(username=request.user.username)
+        except:
+            HttpResponse(status=500)
+
         try:
             isSave = request.POST['is_save']
         except:
             isSave = False
-        result = do_payment(billing_id, product.name, policy.price, target_serial.serial_number, userinfo, isSave)
+        result = do_payment_first(billing_id, policy, target_serial, user) # disabled isSave option. To Enable, edit True to isSave
         
 
         if result is not None:

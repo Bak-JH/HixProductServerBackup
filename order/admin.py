@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import BillingInfo, PricingPolicy, PaymentHistory
-
+from .models import *
 # Register your models here.
 @admin.register(BillingInfo)
 class BillingInfoInstanceAdmin(admin.ModelAdmin):
@@ -15,3 +14,7 @@ class PricingPolicyInstanceAdmin(admin.ModelAdmin):
 class TesPaymentHistoryInstanceAdmin(admin.ModelAdmin):
     list_display = ('receipt_id', 'date', 'serial', 'billing_info', 'refunded')
     list_filter = ('date', 'serial', 'billing_info', 'refunded')
+
+@admin.register(RegularPayment)
+class tt(admin.ModelAdmin):
+    pass

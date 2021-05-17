@@ -7,6 +7,7 @@ from django.template.loader import render_to_string
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django_celery_beat.models import CrontabSchedule, PeriodicTask
+from .models import RegularPayment
 import json
 
 
@@ -23,21 +24,25 @@ def billing_bootpay(bootpay, billing_id, product_name, price, order_id, userinfo
                     )
     return result['data'] if result['status'] is 200 else None
 
-def save_billingInfo(isSave, billing_id, card_name, card_number, username):
+
+
+def save_billingInfo(isSave, billing_id, card_name, card_number, user):
     # if len(card_number) == 16:
     #     do something
     part_1 = card_number[:6]
     part_2 = card_number[12:]
     
     card_number = part_1 + "******" + part_2
-    user = User.objects.get(username=username)
+
     result, _ = BillingInfo.objects.get_or_create(billing_key=billing_id, 
                                                 card_name=card_name, 
                                                 card_number=card_number,
                                                 owner=user)
-    if isSave != "true":
-        to_delete = BillingInfo.objects.get(billing_key=result.billing_key)
-        to_delete.delete()
+
+    ### this part is for save option ###
+    # if isSave != "true":
+    #     to_delete = BillingInfo.objects.get(billing_key=result.billing_key)
+    #     to_delete.delete()
 
     return result
 
@@ -93,18 +98,18 @@ def reserve(crontab_date, task, args, name, expired_date=None):
         print(e)
         return None
 
-def reserve_billing(billing_id, product_name, price, target_serial, userinfo, crontab_date):
-    args = json.dumps([billing_id, product_name, price, str(target_serial), userinfo])
+def reserve_billing(crontab_date, regular_id):
+    args = json.dumps([regular_id])
     return reserve(crontab_date, 
                     'order.tasks.do_payment', 
-                    args, 'Billing_'+ billing_id)
+                    args, 'Billing_'+ regular_id)
 
-def reserve_pended_billing(billing_id, product_name, price, target_serial, userinfo):
-    args = json.dumps([billing_id, product_name, price, str(target_serial), userinfo])
+def reserve_pended_billing(regular_id):
+    args = json.dumps([regular_id])
 
     expire_date = datetime.datetime.now()+ datetime.timedelta(days=3)
-    return reserve(['0','0','*','*','*'], 'order.tasks.do_payment', 
-                    args, 'Pended_Billing_'+billing_id, expire_date)
+    return reserve(['*','*','*','*','*'], 'order.tasks.do_payment', 
+                    args, 'Pended_Billing_'+regular_id, expire_date)
 
 def cancel_reserve(receipt_id):
     try:
@@ -119,3 +124,27 @@ def cancel_reserve(receipt_id):
     except Exception as e:
         print(e)
         raise e
+
+def handle_billing_error(regular_id):
+    regular = RegularPayment.objects.get(id=regular_id)
+    msg_html = render_to_string('order/receipt.html', 
+                                {'regular_id': regular.id})
+
+    result = send_mail(
+        'Your Subscription has a problem.',
+        '',
+        'HiX<support@hix.co.kr>',
+        [regular.owner.email],
+        html_message=msg_html
+    )
+
+    try:
+        pended_task = PeriodicTask.objects.get(name='Pended_Billing_'+regular_id)
+        if pended_task.expires <= datetime.datetime.now(pended_task.expires.tzinfo):
+            billing_task = PeriodicTask.objects.get(name='Billing_'+regular_id)
+            print(billing_task)
+            billing_task.delete()
+            pended_task.delete()
+    except Exception as e:
+        print(e)
+        pass
