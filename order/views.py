@@ -34,7 +34,11 @@ def subscribe(request):
             
         target_serial = create_new_serial(product)
         userinfo = {'username': request.user.username, 'email': request.user.email}
-        result = do_payment(billing_id, product.name, policy.price, target_serial.serial_number, userinfo)
+        try:
+            isSave = request.POST['is_save']
+        except:
+            isSave = False
+        result = do_payment(billing_id, product.name, policy.price, target_serial.serial_number, userinfo, isSave)
         
 
         if result is not None:
