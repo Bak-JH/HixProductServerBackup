@@ -117,8 +117,9 @@ def reserve_pended_billing(regular_id):
 def cancel_reserve(receipt_id):
     try:
         history = PaymentHistory.objects.get(receipt_id=receipt_id)
-        billing_key = history.billing_info.billing_key
-        PeriodicTask.objects.get(name='Billing_'+ billing_key).delete()
+        billinginfo = history.billing_info
+        regular = RegularPayment.objects.get(billing_info=billinginfo)
+        PeriodicTask.objects.get(name='Billing_'+ regular.id).delete()
         history.refunded = True
         history.save()
 
@@ -126,7 +127,7 @@ def cancel_reserve(receipt_id):
 
     except Exception as e:
         print(e)
-        raise e
+        raise Exception('Server Error')
 
 def handle_billing_error(regular_id):
     regular = RegularPayment.objects.get(id=regular_id)
