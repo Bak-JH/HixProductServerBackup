@@ -1,0 +1,24 @@
+{% extends 'product/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    HiX Local Library
+{% endblock %}
+
+{% block content %}
+    {% csrf_token %}
+    <form action=""  method="post">
+        {% csrf_token %}
+        <div class="form-col">
+          <div class="form-group col-md-2 mb-2">
+            {{ form.cancel_user|as_crispy_field }}
+          </div>
+          <div class="form-group col-md-2">
+            {{ form.cancel_reason|as_crispy_field }}
+          </div>
+          <div class="form-group col-md-3 mt-4">
+            <button type="submit" class="btn btn-danger">Cancel</button>
+          </div>
+        </div>
+      </form>
+{% endblock %}

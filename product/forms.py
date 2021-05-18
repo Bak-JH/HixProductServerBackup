@@ -93,3 +93,27 @@ class SignupForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password']
+
+class ChangeUsernameForm(forms.ModelForm):
+    username = forms.CharField(label='ID')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.layout = Layout(
+            Row(
+                Column(
+                    Field('username', css_class='form-control mb-4'),
+                    css_class='col-sm-12'
+                ),
+            ),
+
+            Row(
+                Submit('submit', 'Sign up', css_class='btn btn-primary w-100 m-1'),
+                css_class='form-row'
+            )
+        )
+
+    class Meta:
+        model = User
+        fields = ['username']

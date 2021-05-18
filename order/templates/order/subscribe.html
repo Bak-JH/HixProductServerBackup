@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>apiTest</title>
+    <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+    <script src="https://cdn.bootpay.co.kr/js/bootpay-3.3.1.min.js" type="application/javascript"></script>
+
+    <script>
+        // using jQuery
+        function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+            }
+        }
+        return cookieValue;
+        }
+    </script>
+</head>
+<body>
+    <script type="text/javascript">
+        function getUUID() { // UUID v4 generator in JavaScript (RFC4122 compliant)
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 3 | 8);
+                return v.toString(16);
+            });
+        }
+
+        function getParam(sname) {
+            var params = location.search.substr(location.search.indexOf("?") + 1);
+            var sval = "";
+            params = params.split("&");
+            for (var i = 0; i < params.length; i++) {
+                temp = params[i].split("=");
+                if ([temp[0]] == sname) { sval = temp[1]; }
+            }
+            return sval;
+        }
+
+        var csrftoken = getCookie('csrftoken');
+        var formData = new FormData();
+        var order_id = getUUID()
+        BootPay.request({
+            price: 0, // 0으로 해야 한다.
+            application_id: "59a4d323396fa607cbe75de4",
+            name: "{{product}}", //결제창에서 보여질 이름
+            pg: 'kcp',
+            method: 'card_rebill', // 빌링키를 받기 위한 결제 수단
+            show_agree_window: 0, // 부트페이 정보 동의 창 보이기 여부
+            order_id: order_id //고유 주문번호로, 생성하신 값을 보내주셔야 합니다.
+        }).error(function (data) {
+            //결제 진행시 에러가 발생하면 수행됩니다.
+            alert(data.msg)
+            window.location.reload()
+        }).cancel(function (data) {  
+            //결제가 취소되면 수행됩니다.
+            alert('Order canceled.')
+            window.location = 'https://services.hix.co.kr'
+        }).done(function (data) {
+            // 빌링키를 정상적으로 가져오면 해당 데이터를 불러옵니다.
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+
+            formData.append('billing_id', data.billing_key);
+            formData.append('order_id', order_id);
+            formData.append('is_save', urlParams.get('save'))
+            fetch("", {
+                headers: {
+                    'X-CSRFToken': csrftoken
+                },
+                method: 'POST',
+                mode: 'same-origin',  // Do not send CSRF token to another domain.
+                body: formData
+            }).then(response => {
+                if(response.ok){
+                    return response.json()
+                }
+                throw new Error()
+            })
+            .then(data => {
+                window.open(data['receipt_url'], '_blank', 'resizable=1, width=500, height=825')
+                window.location = 'https://services.hix.co.kr/order/thank-you'
+            })
+            .catch(() => {
+                window.location = "https://services.hix.co.kr/error/500"
+            });
+        });
+    </script>
+</body>
+</html>

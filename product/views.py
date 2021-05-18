@@ -1,25 +1,21 @@
-import datetime
-import urllib
-import json
+from django.core import exceptions
+from .serializers import *
+from order.models import BillingInfo, PricingPolicy
+from slicerServer.views import show_error
 
 from django.shortcuts import render
-from django.views import generic
 from django.views.decorators.http import require_GET
-from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
-from django.core.exceptions import MultipleObjectsReturned 
+from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from .models import Product, ProductSerial
 from .forms import *
-from django.db import models
 from django.conf import settings
+from rest_framework.response import Response
 
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.models import SocialAccount
@@ -31,9 +27,11 @@ from allauth.account.utils import perform_login
 
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from django.contrib.admin.views.decorators import staff_member_required
 
 from django_email_verification import sendConfirm
 from .utils import verify_recaptcha
+from .serializers import *
 
 # @require_GET
 # # @login_required
@@ -197,11 +195,11 @@ def product_logout(request):
         next_url = request.GET.get('next')
         if next_url:
             response = HttpResponseRedirect(next_url)
-            response.delete_cookie('username')
+            response.delete_cookie('username', domain='.hix.co.kr')
             return response   
         else:
             response = HttpResponseRedirect('/product/login/')
-            response.delete_cookie('username')
+            response.delete_cookie('username', domain='.hix.co.kr')
             return response
     else:
         return render(request, 'product/logout.html')
@@ -234,4 +232,95 @@ def link_to_local_user(sender, request, sociallogin, **kwargs):
         raise ImmediateHttpResponse(perform_login(request, user, email_verification='optional'))
     except User.DoesNotExist:
         pass
-    
+
+@staff_member_required    
+@login_required(login_url="/product/login")
+def view_profile(request):
+    query = ProductSerial.objects.filter(owner=request.user)
+    serial_keys = []
+    for serial in query:
+        serial_keys.append(serial.serial_number)
+
+    return render(request, 'product/profile.html', {'serial_keys': serial_keys})
+
+@staff_member_required
+@login_required(login_url="/product/login")
+def edit_username(request):
+    error = ""
+    if request.method == 'POST':
+        new_name = request.POST['username']
+        try:
+            user = User.objects.get(username=new_name)
+            error = "Username already exists."
+        except User.DoesNotExist: 
+            old_user = User.objects.get(username=request.user)
+            old_user.username = new_name
+            old_user.save()
+
+            return render(request, 'product/edit_username.html',
+                            {'done': True, 'new_name': new_name})
+        except Exception as e:
+            error = e
+
+    form = ChangeUsernameForm(initial={'username': request.user})
+    return render(request, 'product/edit_username.html',{'error': error, 'form': form})
+
+@staff_member_required
+@login_required(login_url="/product/login")
+def get_serial_list(request, serial_key):
+    return render(request, 'product/profile.html', {'serial_key': serial_key})
+
+@staff_member_required
+@login_required(login_url="/product/login")
+def transmit_serial(request, serial_key):
+    serial = ProductSerial.objects.get(serial_number=serial_key)
+    if serial.owner == request.user:
+        if request.method == "POST":
+            result = request.POST['clicked']
+            if result == 'true':
+                if serial.reset_count > 0:
+                    serial.owner = None
+                    serial.reset_count -= 1
+                    serial.save()
+                    return HttpResponse('ok')
+                else:
+                    return HttpResponse(status=500, reason="No reset count remains.")
+        return render(request, 'product/transmit_serial.html',
+                        { 'serial_key': serial_key, 'product': serial.product,
+                          'reset_count': serial.reset_count })
+    else:
+        return show_error(request, 500)
+
+@api_view(['GET'])
+def get_plans(request): 
+    try:
+        if request.GET.get('filter') is not None:
+            query = PricingPolicy.objects.filter(method=request.GET.get('filter'))
+        else:
+            query = PricingPolicy.objects.all()
+        result = PolicySerializer(query, many=True)
+        print(result.data)
+        return Response(result.data)
+    except Exception as e:
+        print(e)
+        return Response()
+
+@api_view(['GET'])
+def get_plan(request, plan_id):
+    try:
+        query = PricingPolicy.objects.get(pricing_id=plan_id)
+        result = PolicySerializer(query)
+        return Response(result.data)
+    except:
+        return Response(status=500, reason="Plan is not exist")
+
+@api_view(['GET'])
+@staff_member_required
+def get_cards(request):
+    try:
+        query = BillingInfo.objects.filter(owner=request.user)
+        result = BillingInfoSerializer(query, many=True)
+        return Response(result.data)
+    except Exception as e:
+        print(e)
+        return Response()

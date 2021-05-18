@@ -1,0 +1,29 @@
+{% extends "account/email/base_message.html" %}
+
+{% block content %}
+    {%if regular_id %}
+        <h3> Your Subscription has a problem. </h3>
+        <h3> If you want to know what is problem, reply with your error key. </h3>
+        <h3> Your error key is </h3>
+        <h1> {{ regular_id }} </h1>
+    {% else %}
+        <table width="100%" cellspacing="0" cellpadding="0">
+            <tr>
+                <td>
+                    <table cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td style="border-radius: 7px;" bgcolor="#FFFFFF">
+                                <a href="{{ receipt_url }}" target="_blank" style="padding: 8px 12px; border: 1px solid #34B2EA;border-radius: 7px;font-family: Helvetica, Arial, sans-serif;font-size: 14px; color: #000000;text-decoration: none;display: inline-block;">
+                                    Show Receipt             
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <br />
+        <h3> Your serial key is </h3> <br />
+        <h1> {{ serial_key }} </h1>
+    {% endif %}
+{% endblock %}

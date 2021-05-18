@@ -1,4 +1,5 @@
 from __future__ import absolute_import, unicode_literals
+from datetime import timedelta
 
 
 
@@ -37,7 +38,7 @@ for key, value in secrets.items():
 SECRET_KEY = 'lpuy*em0gp)2pr5mvxaptp@(7x1iuq0_+gwa+_l^8#q!o&-kq+'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
@@ -63,6 +64,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'rest_framework',
     'django_email_verification',
+    'celery',
+    'django_celery_beat',
 
     'slicerServer',
     'product',
@@ -70,6 +73,7 @@ INSTALLED_APPS = [
     'management',
     'resin',
     'posts',
+    'order',
     'taggit',
     'taggit_autosuggest',
 ]
@@ -162,14 +166,6 @@ STATIC_ROOT = '../static/'
 
 SITE_ID = 1
 LOGIN_REDIRECT_URL = '/'
-#mine, for testing
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_USE_TLS = True
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = 'palesminion1@gmail.com'
-# EMAIL_HOST_PASSWORD = 'PALESpalla123'
-
 
 
 AUTHENTICATION_BACKENDS = (
@@ -221,12 +217,14 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'https://hix.co.kr',
     'https://services.hix.co.kr',
+    'https://test.com'
 ]
 
 CSRF_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS  = ['hix.co.kr', 'services.hix.co.kr']
+CSRF_TRUSTED_ORIGINS  = ['hix.co.kr', 'services.hix.co.kr', 'test.com']
 CSRF_COOKIE_DOMAIN = '.hix.co.kr'
 
+# for django-email-verification
 EMAIL_FROM_ADDRESS = 'HiX<support@hix.co.kr>'
 EMAIL_ACTIVE_FIELD = 'is_active'
 EMAIL_SERVER = 'smtp.gmail.com'
@@ -235,10 +233,9 @@ EMAIL_ADDRESS = 'support@hix.co.kr'
 
 EMAIL_MAIL_SUBJECT = 'Confirm your email'
 EMAIL_MAIL_HTML = 'auth_mail.html'
-# EMAIL_MAIL_PLAIN = 'auth_mail.txt'
-# EMAIL_TOKEN_LIFE = 60 * 3
 EMAIL_PAGE_TEMPLATE = 'confirm_mail.html'
 EMAIL_PAGE_DOMAIN = 'http://services.hix.co.kr/'
+
 
 # # For Django Email Backend
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -259,12 +256,11 @@ SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 
-RECAPTCHA_SITE_KEY = "6LcBdgcaAAAAACT2L3b6-5uugc0W2Xlr3i62Hpq3"
-RECAPTCHA_SECRET_KEY = "6LcBdgcaAAAAAAjMT3qeFySEmu1e4yyqJCmE6Lxo"
-
 LOGIN_REDIRECT_URL = '/product/login_redirect'
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
 
 # ACCOUNT_EMAIL_REQUIRED = True
 
-
+#celery settingse
+CELERY_TIMEZONE = 'Asia/Seoul'
+CELERY_ENABLE_UTC=False

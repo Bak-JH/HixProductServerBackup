@@ -1,0 +1,83 @@
+{% extends 'product/base.html' %}
+
+{% block title %}
+  HiX Local Library
+{% endblock %}
+
+{% block content %}    
+    <h3> Are you sure to unlink? </h3>
+
+    Serial number : {{ serial_key }} <br />
+    Product: {{ product }} <br />
+    Reset count: {{ reset_count }} / 3<br />
+    
+    {% if reset_count is 1 %}
+        <div class="mt-1 col-md-12 alert alert-warning">
+            This is your last unlink.
+        </div>
+    {% elif reset_count is 0 %}
+        <div class="mt-1 col-md-12 alert alert-danger">
+            No reset count remains.
+        </div>
+    {% endif %}
+
+    <div class="row mt-3 align-items-center">
+        <div class="col-md-6">
+            <button class="btn btn-success btn-block" onclick="unlink()">
+                Unlink
+            </button>
+        </div>
+        <div class="col-md-6">
+            <button class="btn btn-danger btn-block" onclick="window.history.back()">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+    <script>
+        // using jQuery
+        function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+            }
+        }
+        return cookieValue;
+        }
+    </script>
+    <script>
+        var csrftoken = getCookie('csrftoken');
+        var formData = new FormData();
+        formData.append('clicked', true);
+        function unlink(){
+            fetch("", {
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    method: 'POST',
+                    mode: 'same-origin',  // Do not send CSRF token to another domain.
+                    body: formData
+                }).then(response =>{
+                    console.log(response)
+                    if(response.statusText == 'OK'){
+                        alert('Unlink done')
+                        window.location=document.referrer;
+                    }
+                    else{
+                        alert(response.statusText)
+                        window.location=document.referrer;
+                    }
+                })
+        }
+    </script>
+{% endblock %}
