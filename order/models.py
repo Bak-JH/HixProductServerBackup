@@ -37,7 +37,7 @@ class PricingPolicy(models.Model):
 
 class RegularPayment(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    serial = models.ForeignKey('product.ProductSerial', on_delete=models.SET_NULL, null=True, blank=True)
+    serial = models.ForeignKey('product.ProductSerial', on_delete=models.CASCADE, default=None)
     billing_info = models.ForeignKey('order.BillingInfo', on_delete=models.SET_NULL, null=True, blank=True)
     policy = models.ForeignKey('order.PricingPolicy', on_delete=models.SET_NULL, null=True, blank=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, default=None)

@@ -108,7 +108,10 @@ def reserve_pended_billing(regular_id):
     args = json.dumps([regular_id])
 
     expire_date = datetime.datetime.now()+ datetime.timedelta(days=3)
-    return reserve(['*','*','*','*','*'], 'order.tasks.do_payment', 
+    return reserve([str(datetime.datetime.now().minute),
+                    str(datetime.datetime.now().hour),
+                    '*','*','*'], 
+                    'order.tasks.do_payment', 
                     args, 'Pended_Billing_'+regular_id, expire_date)
 
 def cancel_reserve(receipt_id):

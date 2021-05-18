@@ -13,7 +13,7 @@ from rest_framework.decorators import api_view
 
 from django.contrib.admin.views.decorators import staff_member_required
 
-def do_payment_first(billing_id, policy, serial, user):
+def do_payment_first(billing_id, policy, user):
     bootpay = load_bootpay()
     if bootpay.response['status'] is 200:
         result = billing_bootpay(
@@ -27,13 +27,18 @@ def do_payment_first(billing_id, policy, serial, user):
 
         if result is not None:
             billinginfo = save_billingInfo(True, billing_id, result['card_name'], result['card_no'], user)# disabled isSave
-            save_receipt(result['receipt_id'], result['receipt_url'], result['purchased_at'], serial.serial_number, billinginfo)
+            target_serial = create_new_serial(policy.product)
+            save_receipt(result['receipt_id'], result['receipt_url'], result['purchased_at'], target_serial.serial_number, billinginfo)
             send_receipt(result['receipt_url'],
-                        user.email, serial.serial_number)
+                        user.email, target_serial.serial_number)
             
-            crontab_date = ('*','*','*',str(datetime.datetime.today().day),'*')
+            crontab_date = (str(datetime.datetime.now().minute),
+                            str(datetime.datetime.now().hour),
+                            '*',
+                            str(datetime.datetime.today().day),
+                            '*')
 
-            regular = RegularPayment.objects.create(serial=serial, billing_info=billinginfo, policy=policy)
+            regular = RegularPayment.objects.create(serial=target_serial, billing_info=billinginfo, policy=policy, owner=user)
 
             reserve_billing(crontab_date, str(regular.id))
             return result['receipt_url']
@@ -62,7 +67,6 @@ def subscribe(request):
             except:
                 return HttpResponse(status=500)
             
-        target_serial = create_new_serial(product)
         try:
             user = User.objects.get(username=request.user.username)
         except:
@@ -72,7 +76,7 @@ def subscribe(request):
             isSave = request.POST['is_save']
         except:
             isSave = False
-        result = do_payment_first(billing_id, policy, target_serial, user) # disabled isSave option. To Enable, edit True to isSave
+        result = do_payment_first(billing_id, policy, user) # disabled isSave option. To Enable, edit True to isSave
         
 
         if result is not None:
