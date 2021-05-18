@@ -292,7 +292,6 @@ def transmit_serial(request, serial_key):
         return show_error(request, 500)
 
 @api_view(['GET'])
-@staff_member_required
 def get_plans(request): 
     try:
         if request.GET.get('filter') is not None:
@@ -307,7 +306,6 @@ def get_plans(request):
         return Response()
 
 @api_view(['GET'])
-@staff_member_required
 def get_plan(request, plan_id):
     try:
         query = PricingPolicy.objects.get(pricing_id=plan_id)

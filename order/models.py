@@ -11,7 +11,7 @@ class BillingInfo(models.Model):
     billing_key = models.CharField(primary_key=True, unique=True, max_length=50)
     card_name = models.CharField(max_length=50, default="")
     card_number = models.CharField(max_length=20, default="")
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
 
 class PaymentHistory(models.Model):
     receipt_id = models.CharField(primary_key=True, unique=True, max_length=100)
@@ -37,7 +37,7 @@ class PricingPolicy(models.Model):
 
 class RegularPayment(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    serial = models.ForeignKey('product.ProductSerial', on_delete=models.CASCADE, default=None)
+    serial = models.ForeignKey('product.ProductSerial', on_delete=models.CASCADE, blank=False)
     billing_info = models.ForeignKey('order.BillingInfo', on_delete=models.SET_NULL, null=True, blank=True)
     policy = models.ForeignKey('order.PricingPolicy', on_delete=models.SET_NULL, null=True, blank=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
