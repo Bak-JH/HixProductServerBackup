@@ -109,7 +109,7 @@ class ChangeUsernameForm(forms.ModelForm):
             ),
 
             Row(
-                Submit('submit', 'Sign up', css_class='btn btn-primary w-100 m-1'),
+                Submit('submit', 'Change username', css_class='btn btn-primary w-100 m-1'),
                 css_class='form-row'
             )
         )
@@ -117,3 +117,34 @@ class ChangeUsernameForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username']
+
+class ChangeEmailForm(forms.ModelForm):
+    email = forms.CharField(label='Email')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.layout = Layout(
+            Row(
+                Column(
+                    Field('email', css_class='form-control mb-4'),
+                    css_class='col-sm-12'
+                ),
+            ),
+
+            Row(
+                Submit('submit', 'Change email', css_class='btn btn-primary w-100 m-1', onclick="\
+                    if(email.value) {\
+                        var reauth = confirm('Your account will be deactivated until re-authentication');\
+                        if(!reauth) {\
+                            return false;\
+                        }else{console.log('deeee');}\
+                    }\
+                "),
+                css_class='form-row'
+            )
+        )
+
+    class Meta:
+        model = User
+        fields = ['email']

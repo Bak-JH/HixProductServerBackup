@@ -33,8 +33,10 @@ urlpatterns = [
     path('registration_done/', views.registration_done, name = 'registration_done'),
     path('profile/', views.view_profile, name='view_profile'),
     path('profile/edit-username', views.edit_username, name='edit_username'),
+    path('profile/edit-email', views.edit_email, name='edit_email'),
     path('profile/serial_keys/', views.get_serial_list, name='get_serial_list'),
     path('transmit_serial/<str:serial_key>', views.transmit_serial, name='transmit_serial'),
+    
     
     #this is for react
     path('get_plans/', views.get_plans, name="get_plans"),

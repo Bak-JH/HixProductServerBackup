@@ -291,6 +291,30 @@ def transmit_serial(request, serial_key):
     else:
         return show_error(request, 500)
 
+@staff_member_required
+@login_required(login_url="/product/login")
+def edit_email(request):
+    error = ""
+    if request.method == 'POST':
+        email = request.POST['email']
+        try:
+            user = User.objects.get(email=email)
+            error = "Another account is already using this email."
+        except User.DoesNotExist: 
+            old_user = User.objects.get(username=request.user)
+            old_user.email = email
+            old_user.save()
+            #re-auth
+            old_user.is_active = False
+            sendConfirm(old_user)
+
+            return render(request, 'product/edit_email.html',
+                            {'done': True, 'email': email})
+        except Exception as e:
+            error = e
+    form = ChangeEmailForm(initial={'username': request.user})
+    return render(request, 'product/edit_email.html',{'error': error, 'form': form})
+
 @api_view(['GET'])
 def get_plans(request): 
     try:
