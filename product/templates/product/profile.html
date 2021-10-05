@@ -33,16 +33,31 @@
     </div>
 
     <div class="row mt-5 align-items-center">
-    {% for serial_key in serial_keys %}
-        <div class="col-md-9 mt-3">
-            <h3 class="text-center vcenter"> {{ serial_key }} </h3>
-        </div>
-        <div class="col-md-3 mt-3">
-            <button class="btn btn-default btn-block"
-                    onclick="window.location='https://services.hix.co.kr/product/transmit_serial/{{serial_key}}'">
-                Transmit Serial
-            </button>
-        </div>
-    {% endfor %}
+        <table class="container align-items-center">
+            <th class="col-md-2 h3"> serial key </th>
+            <th class="col-md-2 h3"> plan </th>
+                {% for serial in serial_infos %}
+                    <tr style="height: 100px">
+                        <td class="col-md-4">   
+                            {{ serial.serial_number }}
+                        </td>
+                        <td class="col-md-2">
+                            {{ serial.product }}
+                        </td>
+                        <td class="col-md-2">
+                            <button class="btn btn-default btn-block"
+                                    onclick="window.location='https://services.hix.co.kr/product/transmit_serial/{{serial_key}}'">
+                                Transmit Serial
+                            </button>
+                        </td>
+                        <td class="col-md-2">
+                            <button class="btn btn-success btn-block"
+                                    onclick="window.location='https://hix.co.kr/plans'">
+                                Upgrade Plan
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+        </table>
     </div>
 {% endblock %}

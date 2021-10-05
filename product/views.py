@@ -237,11 +237,11 @@ def link_to_local_user(sender, request, sociallogin, **kwargs):
 @login_required(login_url="/product/login")
 def view_profile(request):
     query = ProductSerial.objects.filter(owner=request.user)
-    serial_keys = []
+    serial_infos = []
     for serial in query:
-        serial_keys.append(serial.serial_number)
+        serial_infos.append(serial)
 
-    return render(request, 'product/profile.html', {'serial_keys': serial_keys})
+    return render(request, 'product/profile.html', {'serial_infos': serial_infos})
 
 @staff_member_required
 @login_required(login_url="/product/login")
