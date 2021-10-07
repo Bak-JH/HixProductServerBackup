@@ -278,7 +278,7 @@ def transmit_serial(request, serial_key):
                     serial.owner = None
                     serial.reset_count -= 1
                     serial.save()
-                    return HttpResponse('ok')
+                    return HttpResponseRedirect('/product/login')
                 else:
                     return HttpResponse(status=500, reason="No reset count remains.")
         return render(request, 'product/transmit_serial.html',
@@ -303,8 +303,7 @@ def edit_email(request):
             old_user.is_active = False
             sendConfirm(old_user)
 
-            return render(request, 'product/edit_email.html',
-                            {'done': True, 'email': email})
+            return HttpResponseRedirect('/product/login')
         except Exception as e:
             error = e
     form = ChangeEmailForm(initial={'username': request.user})

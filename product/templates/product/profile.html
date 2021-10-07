@@ -31,33 +31,35 @@
             </button>
         </div>
     </div>
-
-    <div class="row mt-5 align-items-center">
-        <table class="container align-items-center">
-            <th class="col-md-2 h3"> serial key </th>
-            <th class="col-md-2 h3"> plan </th>
-                {% for serial in serial_infos %}
-                    <tr style="height: 100px">
-                        <td class="col-md-4">   
-                            {{ serial.serial_number }}
-                        </td>
-                        <td class="col-md-2">
-                            {{ serial.product }}
-                        </td>
-                        <td class="col-md-2">
-                            <button class="btn btn-default btn-block"
-                                    onclick="window.location='https://services.hix.co.kr/product/transmit_serial/{{serial_key}}'">
-                                Transmit Serial
-                            </button>
-                        </td>
-                        <td class="col-md-2">
-                            <button class="btn btn-success btn-block"
-                                    onclick="window.location='https://hix.co.kr/plans'">
-                                Upgrade Plan
-                            </button>
-                        </td>
-                    </tr>
-                {% endfor %}
-        </table>
-    </div>
+    {% if serial_infos %}
+        <div class="row mt-5 align-items-center">
+            <table class="container align-items-center">
+                <th class="col-md-2 h3"> serial key </th>
+                <th class="col-md-2 h3"> plan </th>
+                
+                    {% for serial in serial_infos %}
+                        <tr style="height: 100px">
+                            <td class="col-md-4">   
+                                {{ serial.serial_number }}
+                            </td>
+                            <td class="col-md-2">
+                                {{ serial.product }}
+                            </td>
+                            <td class="col-md-2">
+                                <button class="btn btn-default btn-block"
+                                        onclick="window.location='https://services.hix.co.kr/product/transmit_serial/{{serial.serial_number}}'">
+                                    Transmit Serial
+                                </button>
+                            </td>
+                            <td class="col-md-2">
+                                <button class="btn btn-success btn-block"
+                                        onclick="window.location='https://hix.co.kr/plans'">
+                                    Upgrade Plan
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+            </table>
+        </div>
+    {% endif %}
 {% endblock %}

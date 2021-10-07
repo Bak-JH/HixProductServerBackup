@@ -23,7 +23,12 @@
 
     <div class="row mt-3 align-items-center">
         <div class="col-md-6">
-            <button class="btn btn-success btn-block" onclick="unlink()">
+            <button class="btn btn-success btn-block" onclick="
+            var trans_confirm = confirm('Your account will be logged out');
+            if(!trans_confirm) {
+                return false;
+            }else{unlink();}
+            ">
                 Unlink
             </button>
         </div>
@@ -71,7 +76,7 @@
                     console.log(response)
                     if(response.statusText == 'OK'){
                         alert('Unlink done')
-                        window.location=document.referrer;
+                        window.location=response.url;
                     }
                     else{
                         alert(response.statusText)
