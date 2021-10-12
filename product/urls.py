@@ -32,6 +32,7 @@ urlpatterns = [
     path('register/', views.register, name = 'register_product'),
     path('registration_done/', views.registration_done, name = 'registration_done'),
     path('profile/', views.view_profile, name='view_profile'),
+    path('profile/auth-pw', views.auth_pw, name='auth-pw'),
     path('profile/edit-username', views.edit_username, name='edit_username'),
     path('profile/edit-email', views.edit_email, name='edit_email'),
     path('profile/serial_keys/', views.get_serial_list, name='get_serial_list'),

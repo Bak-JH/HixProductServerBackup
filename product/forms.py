@@ -94,6 +94,30 @@ class SignupForm(forms.ModelForm):
         model = User
         fields = ['username', 'email', 'password']
 
+class ReauthPWForm(forms.ModelForm):
+    password = forms.CharField(label='Password', widget=forms.PasswordInput)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper(self)
+        self.helper.layout = Layout(
+            Row(
+                Column(
+                    Field('password', css_class='form-control mb-4'),
+                    css_class='col-sm-12'
+                ),
+            ),
+
+            Row(
+                Submit('submit', 'Submit', css_class='btn btn-primary w-100 m-1'),
+                css_class='form-row'
+            )
+        )
+
+    class Meta:
+        model = User
+        fields = ['password']
+
 class ChangeUsernameForm(forms.ModelForm):
     username = forms.CharField(label='ID')
 
@@ -138,7 +162,7 @@ class ChangeEmailForm(forms.ModelForm):
                         var reauth = confirm('Your account will be deactivated until re-authentication');\
                         if(!reauth) {\
                             return false;\
-                        }else{console.log('deeee');}\
+                        }\
                     }\
                 "),
                 css_class='form-row'

@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import check_password
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
@@ -241,6 +242,21 @@ def view_profile(request):
         serial_infos.append(serial)
 
     return render(request, 'product/profile.html', {'serial_infos': serial_infos})
+
+@login_required(login_url="/product/login")
+def auth_pw(request):
+    if request.method == 'POST':
+        submit_pw = request.POST['password']
+        user = request.user
+
+        if check_password(submit_pw, user.password):
+            next_url = request.GET.get('next')
+            if next_url:
+                return HttpResponseRedirect(next_url)
+        else:
+            return HttpResponse(status=500, reason="Password Incorrect")
+    form = ReauthPWForm()
+    return render(request, 'product/pw_auth.html', {'form': form})
 
 @login_required(login_url="/product/login")
 def edit_username(request):
