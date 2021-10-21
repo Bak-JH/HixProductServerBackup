@@ -6,12 +6,15 @@
 
 {% block content %}
     <div class="row mt-3 align-items-center">
-        <div class="col-md-6 mt-3">
-            <h3 class="text-center vcenter"> {{user.username}} </h3>
+        <div class="col-md-3" style="font-size:24px;">
+            <b>ID:</b>
+        </div>
+        <div class="col-md-3" style="text-size:14px;">
+            {{user.username}}
         </div>
         <div class="col-md-3">
             <button class="btn btn-default btn-block" onclick="window.location='/product/profile/auth-pw?next=/product/profile/edit-username'">
-                Change Username
+                Change ID
             </button>
         </div>
         <div class="col-md-3">
@@ -22,10 +25,13 @@
     </div>
 
     <div class="row mt-3 align-items-center">
-        <div class="col-md-6 mt-3">
-            <h3 class="text-center vcenter"> {{user.email}} </h3>
+        <div class="col-md-3" style="font-size:24px;">
+            <b>Email:</b>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 mt-3">
+            {{user.email}}
+        </div>
+        <div class="col-md-3">
             <button class="btn btn-default btn-block" onclick="window.location='/product/profile/edit-email'">
                 Change Email
             </button>
@@ -34,8 +40,8 @@
     {% if serial_infos %}
         <div class="row mt-5 align-items-center">
             <table class="container align-items-center">
-                <th class="col-md-2 h3"> serial key </th>
-                <th class="col-md-2 h3"> plan </th>
+                <th class="col-md-2 h3" style="font-size:24px;"> <b>serial key</b> </th>
+                <th class="col-md-2 h3" style="font-size:24px;"> <b>plan</b> </th>
                 
                     {% for serial in serial_infos %}
                         <tr style="height: 100px">
@@ -46,7 +52,7 @@
                                 {{ serial.product }}
                             </td>
                             <td class="col-md-2">
-                                <button class="btn btn-default btn-block"
+                                <button class="btn btn-danger btn-block"
                                         onclick="window.location='https://services.hix.co.kr/product/transmit_serial/{{serial.serial_number}}'">
                                     Transmit Serial
                                 </button>
