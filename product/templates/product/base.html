@@ -21,7 +21,7 @@
         <div class="col-8">
           {% comment %} <h1 class="mt-2">HiX</h1> {% endcomment %}
           <div class="row d-flex align-items-center justify-content-lg-between">
-            <img class="ml-3" src="{% static "product/logo-blue.png" %}" alt="logo">
+            <img class="ml-3" width="200px" src="{% static "product/logo-blue.png" %}" alt="logo">
             {% if user.is_authenticated %}
               <div class="mr-3">
                 <form action="/product/logout" method="get">
