@@ -1,5 +1,5 @@
 from __future__ import absolute_import, unicode_literals
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 
 
@@ -23,6 +23,7 @@ import json
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__name__)))
 UPDATE_FILE_DIR = os.path.join(BASE_DIR, 'SetupFiles')
+LOG_DIR = os.path.join(BASE_DIR, 'Logs')
 
 # secret keys in here
 SECRETS_PATH = os.path.join(BASE_DIR, 'secrets.json')
@@ -87,7 +88,11 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'request_logging.middleware.LoggingMiddleware',
 ]
+
+# ADMINS = ['support@hix.co.kr']
+# MANAGERS = ADMINS
 
 ROOT_URLCONF = 'slicerServer.urls'
 
@@ -260,6 +265,49 @@ LOGIN_REDIRECT_URL = '/product/login_redirect'
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
 
 # ACCOUNT_EMAIL_REQUIRED = True
+
+
+#Logging
+#https://github.com/Rhumbix/django-request-logging#django-request-logging
+LOGGING = {    
+    'version': 1,    
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard' : {
+            'format': '%(asctime)s [%(levelname)8s] %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {        
+        'console': {            
+            'class': 'logging.StreamHandler',        
+        },
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(LOG_DIR, "service.log"),
+            'when': "midnight",
+            'formatter' : 'standard',
+            'backupCount':5, 
+        }
+    },    
+    'loggers': {
+        'django' : {
+            'handlers': ['file', ],            
+            'level': 'DEBUG',  
+            # change debug level as appropiate            
+            'propagate': False,
+        },
+        'django.request': {            
+            'handlers': ['file', ],            
+            'level': 'WARNING',  
+            # change debug level as appropiate            
+            'propagate': False,
+        },
+    },
+}
 
 #celery settingse
 CELERY_TIMEZONE = 'Asia/Seoul'

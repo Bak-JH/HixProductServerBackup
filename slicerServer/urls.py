@@ -40,7 +40,7 @@ urlpatterns = [
     path('email/', include(mail_urls)),
     path('order/', include('order.urls')),
     path('taggit_autosuggest/', include('taggit_autosuggest.urls')),
-    path('error/<int:errcode>', views.show_error, name = 'show_error')
+    path('error/<int:errcode>', views.show_error, name = 'show_error'),
 ]
 
 

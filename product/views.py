@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
-from .models import Product, ProductSerial
+from .models import Product, ProductSerial, CrashFile
 from .forms import *
 from django.conf import settings
 from rest_framework.response import Response
@@ -324,3 +324,21 @@ def get_cards(request):
     except Exception as e:
         print(e)
         return Response()
+
+@api_view(['POST'])
+def log_upload(request):
+    if(request.data['dmp_file'].name.endswith(".dmp")):
+        try:
+            crash_data = CrashFile(build_id=request.data['build_id'],
+                                    version=request.data['version'],
+                                    desc=request.data['desc'],
+                                    email=request.data['email'],
+                                    dmp_file=request.data['dmp_file'])
+            crash_data.save()
+            print(request.data)
+            return Response("done", status=200)
+        except Exception as e:
+            print(e)
+            return Response("error", status=500)
+
+    return Response("error", status=500)

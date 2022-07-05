@@ -1,3 +1,4 @@
+from django.utils import timezone
 import hashlib
 from django.db import models
 from django.contrib.auth.models import User
@@ -44,5 +45,13 @@ class ProductSerial(models.Model):
     def get_absolut_url(self):
         return reverse('product:profile:serial_keys',
                        args=[self.serial_number])
+
+class CrashFile(models.Model):
+    build_id = models.CharField(max_length=30)
+    version = models.CharField(max_length=10)
+    email = models.EmailField(null=True, blank=True)
+    desc = models.TextField(null=True, blank=True)
+    date = models.DateTimeField(default=timezone.now)
+    dmp_file = models.FileField(upload_to="logs/HixServer/")
 
     #TODO: constraint to make sure {owner, product} is unique when owner is NOT NULL

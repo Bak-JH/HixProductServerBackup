@@ -40,4 +40,7 @@ urlpatterns = [
     path('get_plans/', views.get_plans, name="get_plans"),
     path('get_plan/<str:plan_id>', views.get_plan, name="get_plan"),
     path('get_cards/', views.get_cards, name="get_cards"),
+
+    #log file
+    path('log_upload/', views.log_upload, name = 'log_upload'),
 ]
