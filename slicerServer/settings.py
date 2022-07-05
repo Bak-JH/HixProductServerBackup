@@ -77,6 +77,7 @@ INSTALLED_APPS = [
     'order',
     'taggit',
     'taggit_autosuggest',
+    'dbbackup',
 ]
 
 MIDDLEWARE = [
@@ -127,6 +128,10 @@ DATABASES = {
     }
 }
 
+# Database Backup
+# https://github.com/jazzband/django-dbbackup
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': '/mnt/c/dev/testBackup'}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
