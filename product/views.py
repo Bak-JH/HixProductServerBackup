@@ -333,8 +333,15 @@ def log_upload(request):
         #crash? or report?
         try:
             data = json.loads(request.body.decode('utf-8'))
-            print(data)
-            return Response(status=200)
+            try:
+                crash_data = CrashFile(build_id=data['build_id'],
+                                        version=data['version'],
+                                        desc=data['call-stack'])
+                crash_data.save()
+                return Response(status=200)
+            except Exception as e:
+                print(e)
+                return Response(status=500)
         except:
             #crash file
             print(request.data)
@@ -349,6 +356,6 @@ def log_upload(request):
                     return Response(status=200)
                 except Exception as e:
                     print(e)
-                    return Response("error", status=500)
+                    return Response(status=500)
 
-    return Response(request)
+    return Response(status=500)

@@ -66,7 +66,7 @@ class SerialBatchInstanceAdmin(admin.ModelAdmin):
 
 @admin.register(CrashFile)
 class CrashFilesInstanceAdmin(admin.ModelAdmin):
-    list_display = ('build_id', 'version', 'email', 'desc', 'date', 'download_link')
+    list_display = ('build_id', 'version', 'email', 'date', 'download_link')
     list_filter = ('version', 'email', 'date')
 
     # add custom view to urls
