@@ -1,37 +1,38 @@
-from django.core import exceptions
 from .serializers import *
-from order.models import BillingInfo, PricingPolicy
-from slicerServer.views import show_error
-
-from django.shortcuts import render
-from django.views.decorators.http import require_GET
-from django.contrib.auth.decorators import permission_required
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
-from django.urls import reverse
 from .models import Product, ProductSerial, CrashFile
 from .forms import *
-from django.conf import settings
-from rest_framework.response import Response
+from .utils import verify_recaptcha
+from .serializers import *
 
 from allauth.account.signals import user_signed_up
 from allauth.socialaccount.models import SocialAccount
 from allauth.socialaccount.signals import pre_social_login
 from allauth.exceptions import ImmediateHttpResponse
-from django.dispatch import receiver
 from allauth.account.utils import perform_login
 
+from django.conf import settings
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.dispatch import receiver
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
+from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET
+from django_email_verification import sendConfirm
+
+import json
+
+from order.models import BillingInfo, PricingPolicy
 
 from rest_framework.response import Response
+from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from django.contrib.admin.views.decorators import staff_member_required
 
-from django_email_verification import sendConfirm
-from .utils import verify_recaptcha
-from .serializers import *
+from slicerServer.views import show_error
 
 # @require_GET
 # # @login_required
@@ -325,20 +326,29 @@ def get_cards(request):
         print(e)
         return Response()
 
+@method_decorator(csrf_exempt, name='dispatch')
 @api_view(['POST'])
 def log_upload(request):
-    if(request.data['dmp_file'].name.endswith(".dmp")):
+    if request.method == "POST":
+        #crash? or report?
         try:
-            crash_data = CrashFile(build_id=request.data['build_id'],
-                                    version=request.data['version'],
-                                    desc=request.data['desc'],
-                                    email=request.data['email'],
-                                    dmp_file=request.data['dmp_file'])
-            crash_data.save()
+            data = json.loads(request.body.decode('utf-8'))
+            print(data)
+            return Response(status=200)
+        except:
+            #crash file
             print(request.data)
-            return Response("done", status=200)
-        except Exception as e:
-            print(e)
-            return Response("error", status=500)
+            if(request.data['dmp_file'].name.endswith(".dmp")):
+                try:
+                    crash_data = CrashFile(build_id=request.data['build_id'],
+                                            version=request.data['version'],
+                                            desc=request.data['desc'],
+                                            email=request.data['email'],
+                                            dmp_file=request.data['dmp_file'])
+                    crash_data.save()
+                    return Response(status=200)
+                except Exception as e:
+                    print(e)
+                    return Response("error", status=500)
 
-    return Response("error", status=500)
+    return Response(request)

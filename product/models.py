@@ -1,14 +1,11 @@
 from django.utils import timezone
-import hashlib
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from taggit_autosuggest.managers import TaggableManager
 from django.urls import reverse
-
+from taggit_autosuggest.managers import TaggableManager
 import uuid
-
 
 # def create_hash(input):
 #     hashSHA256 = hashlib.sha256()
@@ -52,6 +49,6 @@ class CrashFile(models.Model):
     email = models.EmailField(null=True, blank=True)
     desc = models.TextField(null=True, blank=True)
     date = models.DateTimeField(default=timezone.now)
-    dmp_file = models.FileField(upload_to="logs/HixServer/")
+    dmp_file = models.FileField(null=True, upload_to="logs/HixServer/")
 
     #TODO: constraint to make sure {owner, product} is unique when owner is NOT NULL
