@@ -1,15 +1,12 @@
-from django.core import exceptions
 from .serializers import *
 from order.models import BillingInfo, PricingPolicy
 from slicerServer.views import show_error
 
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
-from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from .models import Product, ProductSerial
@@ -29,7 +26,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from django.contrib.admin.views.decorators import staff_member_required
 
-from django_email_verification import sendConfirm
+from django_email_verification import send_email, verify_token
 from .utils import verify_recaptcha
 from .serializers import *
 
@@ -108,25 +105,26 @@ def product_signup(request):
         if request.method == "POST":
             form = SignupForm(request.POST)
             if form.is_valid():
-                if verify_recaptcha(request.POST.get('g-recaptcha-response')):
-                    if get_user_with_email(form.cleaned_data['email']) is not None:
-                        error = 'Email already exists. Try again with another email'
-                        context = {
-                            'form': form,
-                            'error': error
-                        }
-                        return render(request, 'product/signup.html', context)
+                # if verify_recaptcha(request.POST.get('g-recaptcha-response')):
+                    # if get_user_with_email(form.cleaned_data['email']) is not None:
+                    #     error = 'Email already exists. Try again with another email'
+                    #     context = {
+                    #         'form': form,
+                    #         'error': error
+                    #     }
+                    #     return render(request, 'product/signup.html', context)
                     new_user = User.objects.create_user(**form.cleaned_data)
                     new_user.is_active = False
-                    sendConfirm(new_user)
-                    return HttpResponseRedirect(reverse('product_login'))
-                else:
-                    error = 'Invalid reCAPTCHA. Please try again.'
-                    context = {
-                        'form': form,
-                        'error': error
-                    }
-                return render(request, 'product/signup.html', context)
+                    send_email(new_user)
+                    return HttpResponse()
+                    # return HttpResponseRedirect(reverse('product_login'))
+                # else:
+                #     error = 'Invalid reCAPTCHA. Please try again.'
+                #     context = {
+                #         'form': form,
+                #         'error': error
+                #     }
+                # return render(request, 'product/signup.html', context)
             return render(request, 'product/signup.html', {'form': form})                        
         #get
         else:

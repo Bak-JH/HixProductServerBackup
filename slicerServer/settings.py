@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'channels',
     'crispy_forms',
+    'crispy_bootstrap4',
     'rest_framework',
     'django_email_verification',
     'celery',
@@ -221,7 +222,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CSRF_COOKIE_SECURE = True
-CSRF_TRUSTED_ORIGINS  = ['hix.co.kr', 'services.hix.co.kr', 'test.com']
+CSRF_TRUSTED_ORIGINS  = ['https://hix.co.kr', 'https://services.hix.co.kr', 'https://test.com']
 CSRF_COOKIE_DOMAIN = '.hix.co.kr'
 
 # for django-email-verification
@@ -230,9 +231,11 @@ EMAIL_ACTIVE_FIELD = 'is_active'
 EMAIL_SERVER = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_ADDRESS = 'support@hix.co.kr'
+EMAIL_MAIL_TOKEN_LIFE = 60 * 10
 
 EMAIL_MAIL_SUBJECT = 'Confirm your email'
 EMAIL_MAIL_HTML = 'auth_mail.html'
+EMAIL_MAIL_PLAIN = 'auth_mail.txt'
 EMAIL_PAGE_TEMPLATE = 'confirm_mail.html'
 EMAIL_PAGE_DOMAIN = 'http://services.hix.co.kr/'
 
@@ -264,3 +267,6 @@ ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = True
 #celery settingse
 CELERY_TIMEZONE = 'Asia/Seoul'
 CELERY_ENABLE_UTC=False
+
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
